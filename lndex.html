@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hera — Chuyên Gia Tư Vấn Tâm Lý & Mối Quan Hệ Tình Cảm</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --pink-glow: rgba(244, 114, 182, 0.55);
+      --purple-deep: #15111d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 15% 15%, #2b1838 0%, #171222 45%, #0f0c17 100%);
+      color: #fdf2f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    .font-display { font-family: 'Playfair Display', serif; }
+    @media (pointer: fine) {
+      body, a, button, input, select, textarea { cursor: none !important; }
+    }
+    #heartCursor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 26px; height: 26px;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out;
+      filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.95)) drop-shadow(0 0 20px rgba(236, 72, 153, 0.7));
+    }
+    #heartCursor.clicking { transform: translate(-50%, -50%) scale(1.35); }
+    @media (pointer: coarse) { #heartCursor { display: none !important; } }
+    .click-heart-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99998;
+      font-size: 16px;
+      user-select: none;
+      animation: heartBurstFly 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      filter: drop-shadow(0 0 8px rgba(244, 114, 182, 0.85));
+    }
+    @keyframes heartBurstFly {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
+      60% { opacity: 0.95; }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.25) rotate(var(--rot)); }
+    }
+    .btn-love-glow {
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 50%, #9333ea 100%);
+      box-shadow: 0 8px 28px rgba(236, 72, 153, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .btn-love-glow:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 36px rgba(236, 72, 153, 0.68), 0 0 22px rgba(244, 114, 182, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    }
+    .btn-love-glow:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    .btn-love-glow:disabled { opacity: 0.55; filter: grayscale(0.25); }
+    @keyframes cupidHappyFlip {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    @keyframes cardFloatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes shakeInputError {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    .input-shake-error { animation: shakeInputError 0.35s ease-in-out; }
+    .cupid-joy-active { animation: cupidHappyFlip 0.75s cubic-bezier(0.22, 1, 0.36, 1); }
+    .floating-stat-card {
+      animation: cardFloatSlow 4.2s ease-in-out infinite;
+      backdrop-filter: blur(12px);
+    }
+    .floating-stat-card-delay-1 { animation-delay: 0.6s; }
+    .floating-stat-card-delay-2 { animation-delay: 1.2s; }
+    .floating-stat-card-delay-3 { animation-delay: 1.8s; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(24, 21, 30, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(244, 114, 182, 0.35); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(244, 114, 182, 0.65); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes spinOnceSmooth {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin-refresh-icon {
+      display: inline-block;
+      animation: spinOnceSmooth 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes voicePulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.65); }
+      70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+    .voice-active-pulse {
+      animation: voicePulseRing 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="relative selection:bg-pink-500/30 selection:text-pink-100">
+  <!-- Canvas nền hiệu ứng trái tim & hạt ánh sáng -->
+  <canvas id="bgLoveCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <!-- Con trỏ trái tim phát sáng -->
+  <div id="heartCursor" aria-hidden="true">
+    <svg viewBox="0 0 32 32" class="w-full h-full">
+      <defs>
+        <linearGradient id="cursorHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff85c0" />
+          <stop offset="50%" stop-color="#f43f5e" />
+          <stop offset="100%" stop-color="#d946ef" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#cursorHeartGrad)" stroke="#ffffff" stroke-width="1.5"
+        d="M16 28.2C16 28.2 3.5 19.8 3.5 10.6C3.5 6.5 6.7 3.5 10.5 3.5C12.9 3.5 15 4.7 16 6.6C17 4.7 19.1 3.5 21.5 3.5C25.3 3.5 28.5 6.5 28.5 10.6C28.5 19.8 16 28.2 16 28.2Z" />
+    </svg>
+  </div>
+
+  <!-- Thông báo Toast -->
+  <div id="toastContainer" class="fixed top-20 right-4 z-[100] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+  <!-- Thanh điều hướng trên cùng -->
+  <header class="sticky top-0 z-40 bg-[#15111d]/85 backdrop-blur-xl border-b border-pink-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 lg:gap-4">
+      <a href="#top" class="flex items-center gap-2.5 group shrink-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/35 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="block text-sm sm:text-base font-extrabold bg-gradient-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent leading-tight">
+            Hera • Relationship Counselor
+          </span>
+          <span class="block text-[11px] text-pink-300/75 font-medium">Chuyên Gia Tư Vấn Tâm Lý & Tình Cảm</span>
+        </div>
+      </a>
+
+      <div class="relative flex-1 max-w-xs hidden md:block">
+        <input id="headerTopicSearch" type="text" placeholder="Tìm chủ đề: crush, mập mờ, gắn bó, red flag..."
+          class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/5 border border-pink-400/20 focus:border-pink-400 focus:outline-none text-xs text-white placeholder-pink-200/45 transition-all" />
+        <svg class="w-4 h-4 text-pink-300/60 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <div id="headerSearchDropdown" class="hidden absolute left-0 right-0 mt-1.5 bg-[#24202b] border border-pink-500/30 rounded-2xl shadow-2xl overflow-hidden z-50"></div>
+      </div>
+
+      <nav class="hidden xl:flex items-center gap-5 text-xs font-medium text-pink-100/80">
+        <a href="#heroSection" class="hover:text-pink-300 transition-colors">Trang chủ</a>
+        <button type="button" onclick="openLoveModal()" class="hover:text-pink-300 transition-colors">Tâm sự cùng Hera</button>
+        <button type="button" onclick="openZodiacModal()" class="hover:text-pink-300 transition-colors">Cung hoàng đạo</button>
+        <a href="#topicsSection" class="hover:text-pink-300 transition-colors">Chủ đề tâm lý</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Nội dung chính -->
+  <main id="top" class="relative z-10">
+    <!-- Hero Section -->
+    <section id="heroSection" class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-14 lg:pt-14 lg:pb-20">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-500/15 border border-pink-400/30 text-pink-200 text-xs font-semibold shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-pink-400 animate-ping"></span>
+            <span>Không gian lắng nghe an toàn & đồng hành cùng Hera 24/24</span>
+          </div>
+
+          <h1 class="font-display text-3xl sm:text-5xl lg:text-[52px] font-bold leading-[1.15] tracking-tight">
+            <span class="text-white">Lắng nghe, tâm sự. </span>
+            <span class="block mt-1 bg-gradient-to-r from-pink-300 via-rose-400 to-purple-300 bg-clip-text text-transparent">
+              Thấu hiểu mọi cung bậc cảm xúc trong tình yêu.
+            </span>
+          </h1>
+
+          <p class="text-sm sm:text-base text-pink-100/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            Chào bạn, mình là <strong class="text-pink-200 font-semibold">Hera</strong> — Chuyên gia Tư vấn Tâm lý & Mối quan hệ Tình cảm. Dù bạn đang bối rối trước những tín hiệu mập mờ, tổn thương sau đổ vỡ, hay muốn xây dựng sự gắn kết lành mạnh — mình luôn ở đây để lắng nghe không phán xét, phân tích khách quan và gợi ý giải pháp thực tế dành riêng cho bạn.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-1">
+            <button type="button" onclick="openLoveModal()" class="btn-love-glow w-full sm:w-auto px-6 py-3.5 rounded-2xl text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2.5">
+              <span class="text-lg">💘</span>
+              <span>Tâm sự cùng Hera ngay</span>
+            </button>
+
+            <button type="button" onclick="openZodiacModal()" class="btn-love-glow w-full sm:w-auto px-6 py-3.5 rounded-2xl text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2.5">
+              <span class="text-lg">♈</span>
+              <span>Xem cung hoàng đạo cặp đôi</span>
+            </button>
+          </div>
+
+          <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs text-pink-200/75">
+            <div class="flex items-center gap-1.5">
+              <span class="text-pink-400">✔</span>
+              <span>Lắng nghe an toàn & không phán xét</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-pink-400">✔</span>
+              <span>Xác thực thông tin chuẩn xác</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-pink-400">✔</span>
+              <span>Giải pháp thực tế & mẫu câu giao tiếp</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Khung hiển thị Thiên Thần 5D Three.js -->
+        <div class="lg:col-span-6 flex items-center justify-center relative py-4">
+          <div class="absolute w-72 h-72 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="relative w-full max-w-[440px] sm:max-w-[480px] rounded-[36px] p-3.5 sm:p-4 bg-gradient-to-br from-pink-200 via-rose-200 to-purple-300 shadow-[0_25px_70px_rgba(236,72,153,0.4)] border-4 border-white/75">
+            <div class="w-2.5 h-2.5 rounded-full bg-rose-500/80 mx-auto mb-2.5"></div>
+
+            <div class="relative rounded-[26px] bg-gradient-to-b from-[#170d28] via-[#26123a] to-[#12091f] overflow-visible border border-pink-400/50 h-[390px] sm:h-[430px] flex flex-col items-center justify-center shadow-inner">
+              <div class="absolute top-3.5 left-4 right-4 z-20 flex items-center justify-between text-[11px] font-bold text-pink-200">
+                <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-pink-400/30">
+                  <span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse"></span>
+                  <span>Thiên Thần 5D • Hera</span>
+                </span>
+                <button type="button" onclick="triggerCupidBlessing(event)" class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-400/30 to-pink-500/40 hover:from-amber-400/50 hover:to-pink-500/60 border border-amber-300/60 text-amber-100 shadow-md transition-all active:scale-95">
+                  ✨ Phép Màu 5D
+                </button>
+              </div>
+
+              <div id="heroCupidStage" title="Kéo chuột để xoay góc nhìn Thiên Thần 5D hoặc nhấn vào để kích hoạt Phép Màu!"
+                class="relative z-10 w-full h-full rounded-[26px] overflow-hidden cursor-grab active:cursor-grabbing">
+              </div>
+
+              <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-3 py-0.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10 text-[10px] text-pink-200/85 whitespace-nowrap">
+                🔄 Kéo để xoay 360° • Chạm để tỏa hào quang
+              </div>
+
+              <!-- Các thẻ chỉ số nổi -->
+              <div class="floating-stat-card z-30 absolute -top-4 -left-3 sm:-left-6 bg-white/95 border border-pink-300 rounded-2xl px-3.5 py-2 shadow-xl shadow-pink-500/20">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-rose-400">Compatibility Score</div>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span id="heroCompatScore" class="text-base sm:text-lg font-extrabold text-rose-600">0%</span>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-pink-100 text-rose-600 font-semibold">Tâm hồn</span>
+                </div>
+              </div>
+
+              <div class="floating-stat-card floating-stat-card-delay-1 z-30 absolute -top-4 -right-3 sm:-right-6 bg-white/95 border border-purple-300 rounded-2xl px-3.5 py-2 shadow-xl shadow-purple-500/20">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-purple-500">Hera Psychology</div>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-800 mt-0.5 flex items-center gap-1">
+                  <span>✨</span>
+                  <span>Secure & Mindful</span>
+                </div>
+              </div>
+
+              <div class="floating-stat-card floating-stat-card-delay-2 z-30 absolute bottom-12 -left-3 sm:-left-7 bg-white/95 border border-pink-300 rounded-2xl px-3 py-2 shadow-xl shadow-pink-500/20 max-w-[155px]">
+                <div class="text-[10px] font-bold text-rose-500 flex items-center gap-1">
+                  <span>💞</span>
+                  <span>Emotional Sync</span>
+                </div>
+                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">Đồng điệu cảm xúc</div>
+                <div class="w-full h-1.5 bg-pink-100 rounded-full mt-1 overflow-hidden">
+                  <div id="heroMatchBar1" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all duration-500" style="width: 12%"></div>
+                </div>
+              </div>
+
+              <div class="floating-stat-card floating-stat-card-delay-3 z-30 absolute bottom-12 -right-3 sm:-right-7 bg-white/95 border border-pink-300 rounded-2xl px-3 py-2 shadow-xl shadow-pink-500/20 max-w-[155px]">
+                <div class="text-[10px] font-bold text-purple-600 flex items-center gap-1">
+                  <span>🧠</span>
+                  <span>Attachment & Trust</span>
+                </div>
+                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">Thấu hiểu & Tin cậy</div>
+                <div class="w-full h-1.5 bg-purple-100 rounded-full mt-1 overflow-hidden">
+                  <div id="heroMatchBar2" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500" style="width: 18%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Danh sách chủ đề tư vấn tâm lý -->
+    <section id="topicsSection" class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-pink-400">Chủ đề tâm sự cùng Hera</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mt-1">Bạn đang băn khoăn điều gì trong tình yêu & cuộc sống?</h2>
+        </div>
+        <button type="button" onclick="openLoveModal()" class="text-xs sm:text-sm font-semibold text-pink-300 hover:text-pink-200 flex items-center gap-1 self-start sm:self-auto">
+          <span>Mở phòng tư vấn cùng Hera</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <div id="topicCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+    </section>
+  </main>
+
+  <!-- Chân trang -->
+  <footer class="relative z-10 border-t border-white/10 bg-[#120e19]/90 py-6 text-center text-xs text-pink-200/60">
+    <p>© 2026 Hera — Chuyên Gia Tư Vấn Tâm Lý & Mối Quan Hệ Tình Cảm. Lắng nghe an toàn • Phân tích khách quan • Đồng hành chân thành.</p>
+  </footer>
+
+  <!-- MODAL 1: PHÒNG TƯ VẤN TÂM LÝ CÙNG HERA -->
+  <div id="loveCounselingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-md">
+    <div class="relative w-full max-w-4xl h-[92vh] sm:h-[88vh] rounded-3xl bg-[#24202b] border border-pink-500/25 shadow-[0_25px_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden">
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-pink-500/15 blur-3xl rounded-full pointer-events-none"></div>
+
+      <!-- Header của Modal Chat -->
+      <div class="relative z-10 px-4 sm:px-6 py-3.5 bg-[#18151e]/90 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-lg shadow-lg shadow-pink-500/30">
+            💘
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold bg-gradient-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+              Hera • Chuyên Gia Tư Vấn Tâm Lý & Tình Cảm
+            </h2>
+            <p class="text-[11px] text-pink-200/70 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="heraEngineStatusLabel">Sẵn sàng • Tư vấn tâm lý trực tuyến 24/7</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <div class="hidden md:block px-3 py-1.5 rounded-2xl bg-[#342f3d]/90 border border-white/10 text-center">
+            <div class="text-[10px] text-pink-200/70">Hòa hợp tâm hồn</div>
+            <div id="modalSoulScore" class="text-xs sm:text-sm font-extrabold bg-gradient-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">0%</div>
+          </div>
+          <div class="hidden md:block px-3 py-1.5 rounded-2xl bg-[#342f3d]/90 border border-white/10 text-center">
+            <div class="text-[10px] text-pink-200/70">Chỉ số thấu hiểu</div>
+            <div id="modalFlutterScore" class="text-xs sm:text-sm font-extrabold text-pink-300">0%</div>
+          </div>
+          <button type="button" onclick="openAiSettingsModal()" title="Cấu hình Gemini API Key"
+            class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-pink-100 text-xs font-semibold transition-all flex items-center gap-1">
+            <span>⚙️</span>
+            <span class="hidden sm:inline">Cài đặt AI</span>
+          </button>
+          <button type="button" onclick="switchModal('loveCounselingModal', 'zodiacCoupleModal')" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-500/15 hover:bg-pink-500/25 border border-pink-400/30 text-pink-200 text-xs font-semibold transition-all">
+            <span>♈</span>
+            <span>Xem cung đôi</span>
+          </button>
+          <button type="button" onclick="closeLoveModal()" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-pink-100 text-xs font-semibold transition-all">
+            ✕ Đóng
+          </button>
+        </div>
+      </div>
+
+      <!-- Khung hiển thị tin nhắn -->
+      <div id="chatMessagesContainer" class="relative z-10 flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4"></div>
+
+      <!-- Khu vực nhập tin nhắn & gợi ý nhanh -->
+      <div class="relative z-10 px-4 sm:px-6 py-3 bg-[#18151e]/95 border-t border-white/10">
+        <!-- Gợi ý hỏi nhanh theo ngữ cảnh -->
+        <div id="quickChipsContainer" class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 no-scrollbar"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="voiceInputToggleBtn" type="button" title="Bật micro để nói chuyện trực tiếp — nói xong hệ thống sẽ tự gửi tin nhắn"
+              class="px-3 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/35 text-pink-100 font-semibold text-xs flex items-center gap-1.5 transition-all">
+              <span>🎙️ Voice chat</span>
+            </button>
+
+            <button id="resetChatBtn" type="button" title="Xóa toàn bộ đoạn chat hiện tại và bắt đầu cuộc trò chuyện mới"
+              class="px-3 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/35 text-pink-100 font-semibold text-xs flex items-center gap-1.5 transition-all">
+              <span id="resetChatIcon">🔄</span>
+              <span>Làm mới đoạn chat</span>
+            </button>
+          </div>
+
+          <span id="voiceListeningHint" class="hidden text-[11px] font-medium text-rose-300 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+            <span>Đang nghe giọng nói của bạn... Nói xong sẽ tự gửi</span>
+          </span>
+        </div>
+
+        <div>
+          <textarea id="chatInput" rows="2"
+            placeholder="Chia sẻ câu chuyện của bạn với Hera (VD: Mập mờ 3 tháng chưa rõ danh phận, người yêu hay im lặng khi giận...)..."
+            class="w-full rounded-2xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-white placeholder-pink-200/45 resize-none transition-all"></textarea>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-2">
+          <div class="text-[11px] text-pink-200/55 hidden sm:block">
+            Nhấn <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-pink-100">Enter</kbd> để gửi • <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-pink-100">Shift + Enter</kbd> xuống dòng
+          </div>
+
+          <div class="flex items-center gap-2 ml-auto">
+            <button id="sendMessageBtn" type="button"
+              class="btn-love-glow px-5 py-2 rounded-xl text-white font-bold text-xs sm:text-sm flex items-center gap-1.5">
+              <span>Gửi cho Hera</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popover Cài đặt Gemini API Key -->
+      <div id="aiSettingsModal" class="hidden absolute inset-0 z-30 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-3xl bg-[#24202b] border border-pink-400/35 p-5 shadow-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+              <span>⚙️</span>
+              <span>Cài đặt Kết nối Gemini AI</span>
+            </h3>
+            <button type="button" onclick="closeAiSettingsModal()" class="text-pink-200/70 hover:text-white text-sm">✕</button>
+          </div>
+
+          <p class="text-xs text-pink-100/80 leading-relaxed">
+            Hệ thống đang sử dụng khóa API bạn đã cấu hình (và tự động chuyển sang chế độ tư vấn thông minh tích hợp sẵn nếu khóa vượt hạn mức hoặc không khả dụng trên trình duyệt). Bạn có thể thay đổi khóa <strong class="text-pink-200">Gemini API Key</strong> mới bên dưới bất cứ lúc nào.
+          </p>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-pink-200/80 mb-1">Gemini API Key</label>
+              <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy... hoặc AQ..."
+                class="w-full px-3.5 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs text-white placeholder-white/30" />
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-pink-200/80 mb-1">Mô hình Gemini Cloud</label>
+              <select id="geminiModelSelect" class="w-full px-3.5 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs text-white">
+                <option value="gemini-2.5-flash">gemini-2.5-flash (Nhanh & Thông minh)</option>
+                <option value="gemini-2.0-flash">gemini-2.0-flash (Ổn định)</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro (Phân tích sâu)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-2">
+            <button type="button" onclick="clearAiSettings()" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-pink-200 font-semibold">
+              Khôi phục mặc định
+            </button>
+            <button type="button" onclick="saveAiSettings()" class="btn-love-glow px-4 py-2 rounded-xl text-xs text-white font-bold">
+              Lưu cấu hình
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: XEM CUNG HOÀNG ĐẠO CẶP ĐÔI (CHẶN NHẬP THÔNG TIN LINH TINH) -->
+  <div id="zodiacCoupleModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-md">
+    <div class="relative w-full max-w-4xl max-h-[92vh] rounded-3xl bg-[#24202b] border border-pink-500/25 shadow-[0_25px_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden text-pink-50">
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-pink-500/15 blur-3xl rounded-full pointer-events-none"></div>
+
+      <div class="relative z-10 px-4 sm:px-6 py-3.5 bg-[#18151e]/90 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-lg shadow-lg shadow-pink-500/30 text-white">
+            ♈
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold bg-gradient-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+              Xem Cung Hoàng Đạo & Tuổi Cặp Đôi
+            </h2>
+            <p class="text-[11px] text-pink-200/70">Chỉ tiếp nhận họ tên thật & ngày sinh thực tế (DD/MM/YYYY)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchModal('zodiacCoupleModal', 'loveCounselingModal')"
+            class="px-3.5 py-2 rounded-xl bg-pink-500/15 hover:bg-pink-500/25 border border-pink-400/30 text-pink-200 text-xs font-semibold transition-all flex items-center gap-1.5">
+            <span>💘</span>
+            <span>Tâm sự cùng Hera</span>
+          </button>
+          <button type="button" onclick="closeZodiacModal()"
+            class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-pink-100 text-xs font-semibold transition-all">
+            ✕ Đóng
+          </button>
+        </div>
+      </div>
+
+      <div class="relative z-10 flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-5">
+        <div class="rounded-3xl bg-[#342f3d]/90 border border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md relative overflow-hidden">
+          <div class="space-y-1.5 text-center sm:text-left flex-1">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">
+              <span>🛡️</span>
+              <span>Xác thực thông tin chính xác • Không chấp nhận dữ liệu ảo</span>
+            </span>
+            <h3 class="text-base sm:text-lg font-extrabold text-white">
+              Thiên Thần 5D & Góc Nhìn Tâm Lý Đôi Lứa
+            </h3>
+            <p class="text-xs sm:text-sm text-pink-100/80 leading-relaxed">
+              Vui lòng nhập đầy đủ <strong class="text-pink-200">Họ và tên thật</strong> (ít nhất 2 từ, không ký tự ngẫu nhiên) và <strong class="text-pink-200">Ngày sinh tồn tại thực tế (DD/MM/YYYY)</strong> của Bạn và Người ấy để xem nét đặc trưng tính cách.
+            </p>
+          </div>
+
+          <div id="zodiacCupidCompanion" onclick="triggerCupidBlessing(event)" title="Nhấn để Thiên Thần 5D tỏa hào quang kết duyên!"
+            class="relative w-36 h-32 sm:w-44 sm:h-36 shrink-0 rounded-2xl bg-[#160b26] border border-pink-400/30 overflow-hidden shadow-[0_10px_25px_rgba(236,72,153,0.4)] cursor-pointer select-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Thẻ Người 1 -->
+          <div id="zodiacCard1" class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 space-y-3 transition-colors">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-xs">💖</span>
+                <span>Thông tin của Bạn</span>
+              </span>
+              <span id="zodiacBadge1" class="px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">Người 1</span>
+            </div>
+
+            <div class="rounded-xl bg-[#18151e] border border-white/10 p-3 space-y-3">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="zodiacName1" class="text-[11px] text-pink-200/75">Họ và tên thật của bạn <span class="text-rose-400">*</span></label>
+                  <span id="zodiacNameState1" class="text-[10px] font-semibold text-pink-200/50">Bắt buộc</span>
+                </div>
+                <input id="zodiacName1" type="text" autocomplete="off" maxlength="48" placeholder="Ví dụ: Nguyễn An Nhiên"
+                  class="w-full px-3 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs sm:text-sm text-white placeholder-white/35 transition-colors" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="zodiacDob1" class="text-[11px] text-pink-200/75">Ngày tháng năm sinh (DD/MM/YYYY) <span class="text-rose-400">*</span></label>
+                  <span id="zodiacDobState1" class="text-[10px] font-semibold text-pink-200/50">Bắt buộc</span>
+                </div>
+                <input id="zodiacDob1" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="Ví dụ: 14/02/2000"
+                  class="w-full px-3 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs sm:text-sm text-white placeholder-white/35 transition-colors" />
+                <p class="text-[10px] text-pink-200/50 mt-1">Nhập số theo định dạng DD/MM/YYYY (năm sinh 1930 – hiện tại, từ 13 tuổi)</p>
+              </div>
+
+              <div id="zodiacValidationMsg1" class="hidden rounded-xl bg-rose-950/80 border border-rose-400/50 px-3 py-2 text-[11px] text-rose-200 leading-relaxed flex items-start gap-1.5"></div>
+            </div>
+          </div>
+
+          <!-- Thẻ Người 2 -->
+          <div id="zodiacCard2" class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 space-y-3 transition-colors">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-xs">💜</span>
+                <span>Thông tin Người ấy</span>
+              </span>
+              <span id="zodiacBadge2" class="px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">Người 2</span>
+            </div>
+
+            <div class="rounded-xl bg-[#18151e] border border-white/10 p-3 space-y-3">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="zodiacName2" class="text-[11px] text-pink-200/75">Họ và tên thật của người ấy <span class="text-rose-400">*</span></label>
+                  <span id="zodiacNameState2" class="text-[10px] font-semibold text-pink-200/50">Bắt buộc</span>
+                </div>
+                <input id="zodiacName2" type="text" autocomplete="off" maxlength="48" placeholder="Ví dụ: Trần Minh Khôi"
+                  class="w-full px-3 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs sm:text-sm text-white placeholder-white/35 transition-colors" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="zodiacDob2" class="text-[11px] text-pink-200/75">Ngày tháng năm sinh (DD/MM/YYYY) <span class="text-rose-400">*</span></label>
+                  <span id="zodiacDobState2" class="text-[10px] font-semibold text-pink-200/50">Bắt buộc</span>
+                </div>
+                <input id="zodiacDob2" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="Ví dụ: 20/10/1999"
+                  class="w-full px-3 py-2 rounded-xl bg-[#18151e] border border-white/15 focus:border-pink-400 focus:outline-none text-xs sm:text-sm text-white placeholder-white/35 transition-colors" />
+                <p class="text-[10px] text-pink-200/50 mt-1">Nhập số theo định dạng DD/MM/YYYY (năm sinh 1930 – hiện tại, từ 13 tuổi)</p>
+              </div>
+
+              <div id="zodiacValidationMsg2" class="hidden rounded-xl bg-rose-950/80 border border-rose-400/50 px-3 py-2 text-[11px] text-rose-200 leading-relaxed flex items-start gap-1.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cảnh báo chung cấp cặp đôi (trùng thông tin, v.v.) -->
+        <div id="zodiacPairGlobalError" class="hidden rounded-2xl bg-rose-950/85 border border-rose-400/55 px-4 py-3 text-xs text-rose-100 leading-relaxed flex items-center gap-2"></div>
+
+        <div class="flex flex-col items-center gap-2">
+          <button id="analyzeZodiacBtn" type="button" class="btn-love-glow px-7 py-3 rounded-2xl text-white font-bold text-sm flex items-center gap-2">
+            <span>💘</span>
+            <span>Xem độ hòa hợp cặp đôi ngay</span>
+          </button>
+          <p class="text-[11px] text-pink-200/55 text-center">
+            Hệ thống tự động từ chối tên giả, chuỗi gõ phím ngẫu nhiên và ngày sinh không tồn tại trên lịch.
+          </p>
+        </div>
+
+        <div id="zodiacResultSection" class="hidden space-y-4 pt-1">
+          <div class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 sm:p-5">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="text-center sm:text-left">
+                <span class="px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">
+                  Kết quả tham khảo đã xác thực
+                </span>
+                <h3 id="zodiacPairHeadline" class="text-lg sm:text-xl font-extrabold text-white mt-1.5">
+                  Bạn & Người ấy
+                </h3>
+                <p id="zodiacPairSummary" class="text-xs sm:text-sm text-pink-100/80 mt-1 leading-relaxed"></p>
+              </div>
+
+              <div class="rounded-2xl bg-[#18151e] border border-pink-500/25 px-5 py-3 text-center shrink-0">
+                <div class="text-[11px] text-pink-200/75">Chỉ số đồng điệu</div>
+                <div id="zodiacTotalPercent" class="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+                  88%
+                </div>
+                <div id="zodiacRankBadge" class="text-[11px] font-semibold text-pink-300 mt-0.5">Tâm đầu ý hợp</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                  <span>🏮</span>
+                  <span>Nét Tương Đồng Thế Hệ & Tuổi</span>
+                </h4>
+                <span id="chineseCompatTag" class="px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">
+                  Tam Hợp
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div class="rounded-xl bg-[#18151e] border border-white/10 p-2.5">
+                  <div class="text-[10px] text-pink-200/65">Tuổi của Bạn</div>
+                  <div id="chineseAnimal1" class="text-xs sm:text-sm font-bold text-white mt-0.5">-</div>
+                  <div id="chineseElement1" class="text-[11px] text-pink-300 mt-0.5">-</div>
+                </div>
+                <div class="rounded-xl bg-[#18151e] border border-white/10 p-2.5">
+                  <div class="text-[10px] text-pink-200/65">Tuổi Người ấy</div>
+                  <div id="chineseAnimal2" class="text-xs sm:text-sm font-bold text-white mt-0.5">-</div>
+                  <div id="chineseElement2" class="text-[11px] text-pink-300 mt-0.5">-</div>
+                </div>
+              </div>
+
+              <div class="rounded-xl bg-[#18151e] border border-white/10 p-3 text-xs text-pink-100/85 leading-relaxed" id="chineseDetailText"></div>
+            </div>
+
+            <div class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                  <span>✨</span>
+                  <span>Đặc Trưng Tính Cách Cung Hoàng Đạo</span>
+                </h4>
+                <span id="westernCompatTag" class="px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] font-semibold">
+                  Đồng Điệu
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div class="rounded-xl bg-[#18151e] border border-white/10 p-2.5">
+                  <div class="text-[10px] text-pink-200/65">Cung của Bạn</div>
+                  <div id="westernSign1" class="text-xs sm:text-sm font-bold text-white mt-0.5">-</div>
+                  <div id="westernElement1" class="text-[11px] text-pink-300 mt-0.5">-</div>
+                </div>
+                <div class="rounded-xl bg-[#18151e] border border-white/10 p-2.5">
+                  <div class="text-[10px] text-pink-200/65">Cung Người ấy</div>
+                  <div id="westernSign2" class="text-xs sm:text-sm font-bold text-white mt-0.5">-</div>
+                  <div id="westernElement2" class="text-[11px] text-pink-300 mt-0.5">-</div>
+                </div>
+              </div>
+
+              <div class="rounded-xl bg-[#18151e] border border-white/10 p-3 text-xs text-pink-100/85 leading-relaxed" id="westernDetailText"></div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-[#342f3d]/90 border border-white/10 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="rounded-xl bg-[#18151e] border border-pink-500/25 p-3 flex-1 text-xs text-pink-100/90 leading-relaxed" id="zodiacAdviceBox"></div>
+            <button id="sendZodiacToChatBtn" type="button" class="btn-love-glow px-4 py-2.5 rounded-xl text-white font-bold text-xs shrink-0 flex items-center gap-1.5">
+              <span>💬</span>
+              <span>Hỏi Hera dưới góc nhìn tâm lý</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREE.JS 5D ANGEL SCRIPT -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    function createGlowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.85)');
+      gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.25)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const sharedGlowTexture = createGlowTexture();
+    const activeAngelControllers = [];
+
+    function createAngel5DInstance(container, options = {}) {
+      if (!container) return null;
+      try {
+        const isMini = Boolean(options.isMini);
+        const colors = {
+          primary: new THREE.Color(0xffd766),
+          secondary: new THREE.Color(0xf472b6),
+          accent: new THREE.Color(0xc084fc),
+          core: new THREE.Color(0xffffff)
+        };
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x160b26, 0.028);
+
+        const width = container.clientWidth || (isMini ? 176 : 420);
+        const height = container.clientHeight || (isMini ? 144 : 410);
+
+        const camera = new THREE.PerspectiveCamera(46, width / height, 0.1, 120);
+        camera.position.set(0, 1.45, isMini ? 9.8 : 9.4);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+        container.innerHTML = '';
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.enableZoom = !isMini;
+        controls.enablePan = false;
+        controls.minDistance = 6.2;
+        controls.maxDistance = 14.5;
+        controls.target.set(0, 1.15, 0);
+
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 0.52, 0.42, 0.44);
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+
+        scene.add(new THREE.AmbientLight(0x6b5b95, 1.9));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+        keyLight.position.set(4, 7, 6);
+        scene.add(keyLight);
+        const fillLight = new THREE.DirectionalLight(0xfbcfe8, 1.5);
+        fillLight.position.set(-5, 3, 4);
+        scene.add(fillLight);
+        const angelLight = new THREE.PointLight(colors.primary, 4.2, 20);
+        angelLight.position.set(0, 2.6, 2.2);
+        scene.add(angelLight);
+        const rimLight = new THREE.PointLight(colors.secondary, 4.5, 22);
+        rimLight.position.set(0, 1.5, -3.5);
+        scene.add(rimLight);
+
+        const angelGroup = new THREE.Group();
+        scene.add(angelGroup);
+
+        const skinSculptMat = new THREE.MeshStandardMaterial({ color: 0xfff5eb, emissive: colors.primary, emissiveIntensity: 0.14, roughness: 0.32, metalness: 0.1 });
+        const armorGoldMat = new THREE.MeshStandardMaterial({ color: 0xffe49e, emissive: colors.primary, emissiveIntensity: 0.25, roughness: 0.22, metalness: 0.85 });
+        const hairMat = new THREE.MeshStandardMaterial({ color: 0xfff8dc, emissive: colors.primary, emissiveIntensity: 0.28, roughness: 0.35, metalness: 0.3, side: THREE.DoubleSide });
+
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, 2.82, 0.04);
+        angelGroup.add(headGroup);
+
+        const headGeo = new THREE.SphereGeometry(0.31, 40, 40);
+        headGeo.scale(0.86, 1.12, 0.94);
+        headGroup.add(new THREE.Mesh(headGeo, skinSculptMat));
+
+        const noseMesh = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.12, 14), skinSculptMat);
+        noseMesh.position.set(0, -0.02, 0.29);
+        noseMesh.rotation.x = 0.25;
+        headGroup.add(noseMesh);
+
+        const eyeGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const irisMat = new THREE.MeshBasicMaterial({ color: colors.secondary });
+        [-1, 1].forEach(side => {
+          const eyeGroup = new THREE.Group();
+          eyeGroup.position.set(side * 0.105, 0.035, 0.255);
+          eyeGroup.rotation.y = side * 0.22;
+          const eyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.034, 14, 14), eyeGlowMat);
+          eyeWhite.scale.set(1.25, 0.72, 0.55);
+          eyeGroup.add(eyeWhite);
+          const iris = new THREE.Mesh(new THREE.SphereGeometry(0.02, 14, 14), irisMat);
+          iris.position.set(0, 0, 0.015);
+          eyeGroup.add(iris);
+          headGroup.add(eyeGroup);
+        });
+
+        for (let h = -3; h <= 3; h++) {
+          const strandCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(h * 0.06, 0.24, -0.05),
+            new THREE.Vector3(h * 0.11, 0.02, -0.28),
+            new THREE.Vector3(h * 0.16, -0.42, -0.34),
+            new THREE.Vector3(h * 0.2, -0.85, -0.28)
+          ]);
+          headGroup.add(new THREE.Mesh(new THREE.TubeGeometry(strandCurve, 16, 0.044 - Math.abs(h) * 0.004, 8, false), hairMat));
+        }
+
+        const crownGroup = new THREE.Group();
+        crownGroup.position.set(0, 0.22, 0.02);
+        crownGroup.rotation.x = -0.15;
+        headGroup.add(crownGroup);
+        const crownBand = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.018, 12, 40), armorGoldMat);
+        crownBand.rotation.x = Math.PI / 2;
+        crownGroup.add(crownBand);
+        for (let c = -2; c <= 2; c++) {
+          const spikeH = c === 0 ? 0.22 : (Math.abs(c) === 1 ? 0.15 : 0.1);
+          const spike = new THREE.Mesh(new THREE.ConeGeometry(0.024, spikeH, 6), armorGoldMat);
+          const angle = c * 0.35;
+          spike.position.set(Math.sin(angle) * 0.26, spikeH * 0.45, Math.cos(angle) * 0.26);
+          spike.rotation.x = 0.15;
+          spike.rotation.z = -angle * 0.5;
+          crownGroup.add(spike);
+        }
+
+        const haloGroup = new THREE.Group();
+        haloGroup.position.set(0, 0.62, -0.06);
+        haloGroup.rotation.x = Math.PI * 0.42;
+        headGroup.add(haloGroup);
+        const haloRing = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.024, 14, 64), new THREE.MeshBasicMaterial({ color: colors.primary }));
+        const haloOuter = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.01, 10, 64), new THREE.MeshBasicMaterial({ color: colors.secondary, transparent: true, opacity: 0.85 }));
+        haloGroup.add(haloRing, haloOuter);
+
+        const torsoGroup = new THREE.Group();
+        torsoGroup.position.set(0, 1.75, 0);
+        angelGroup.add(torsoGroup);
+        const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.35, 20), skinSculptMat);
+        neckMesh.position.set(0, 0.72, 0);
+        torsoGroup.add(neckMesh);
+
+        const chestGeo = new THREE.CylinderGeometry(0.37, 0.22, 1.15, 32, 1, false);
+        chestGeo.scale(1.05, 1, 0.78);
+        torsoGroup.add(new THREE.Mesh(chestGeo, new THREE.MeshStandardMaterial({ color: 0xf8fafc, emissive: colors.primary, emissiveIntensity: 0.22, roughness: 0.28, metalness: 0.25 })));
+
+        const breastplateGeo = new THREE.CylinderGeometry(0.39, 0.25, 0.65, 28, 1, false);
+        breastplateGeo.scale(1.08, 1, 0.84);
+        const breastplateMesh = new THREE.Mesh(breastplateGeo, armorGoldMat);
+        breastplateMesh.position.set(0, 0.22, 0.02);
+        torsoGroup.add(breastplateMesh);
+
+        const heartCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 1), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+        heartCore.position.set(0, 0.28, 0.26);
+        torsoGroup.add(heartCore);
+
+        function createArm(isLeft) {
+          const sign = isLeft ? -1 : 1;
+          const armGroup = new THREE.Group();
+          armGroup.position.set(sign * 0.46, 0.45, 0);
+          const curve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(sign * 0.26, -0.42, 0.16),
+            new THREE.Vector3(sign * 0.38, -0.86, 0.42)
+          ]);
+          armGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 18, 0.072, 12, false), skinSculptMat));
+          const orb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), new THREE.MeshBasicMaterial({ color: isLeft ? 0xffffff : 0xffd766 }));
+          orb.position.set(sign * 0.38, -0.88, 0.54);
+          armGroup.add(orb);
+          return armGroup;
+        }
+        const leftArm = createArm(true);
+        const rightArm = createArm(false);
+        torsoGroup.add(leftArm, rightArm);
+
+        const robeHeight = 3.2;
+        const robeGeo = new THREE.CylinderGeometry(0.24, 1.48, robeHeight, 40, 28, true);
+        robeGeo.translate(0, -robeHeight / 2, 0);
+        const robeInitialPos = robeGeo.attributes.position.array.slice();
+        const robeMesh = new THREE.Mesh(robeGeo, new THREE.MeshStandardMaterial({ color: 0xf8fafc, emissive: colors.secondary, emissiveIntensity: 0.38, side: THREE.DoubleSide, transparent: true, opacity: 0.9, roughness: 0.35, metalness: 0.15 }));
+        robeMesh.position.set(0, 1.25, 0);
+        angelGroup.add(robeMesh);
+
+        const wingsContainer = new THREE.Group();
+        wingsContainer.position.set(0, 2.05, -0.24);
+        angelGroup.add(wingsContainer);
+
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.quadraticCurveTo(0.12, 0.35, 0.045, 1.0);
+        shape.quadraticCurveTo(0, 1.08, -0.045, 1.0);
+        shape.quadraticCurveTo(-0.12, 0.35, 0, 0);
+        const baseFeatherGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.015, bevelEnabled: true, bevelSegments: 1, steps: 1, bevelSize: 0.005, bevelThickness: 0.005 });
+        const wingFeathersData = [];
+
+        function buildWing(isLeft) {
+          const side = isLeft ? -1 : 1;
+          const wingRoot = new THREE.Group();
+          wingRoot.position.set(side * 0.22, 0, 0);
+          const layers = [
+            { count: isMini ? 14 : 20, minLen: 1.4, maxLen: 3.2, spreadAngle: 1.65, zOffset: -0.09, colorType: 'primary', opacity: 0.96 },
+            { count: isMini ? 10 : 14, minLen: 0.92, maxLen: 2.0, spreadAngle: 1.45, zOffset: 0.02, colorType: 'secondary', opacity: 0.98 },
+            { count: isMini ? 8 : 11, minLen: 0.55, maxLen: 1.2, spreadAngle: 1.25, zOffset: 0.11, colorType: 'core', opacity: 1.0 }
+          ];
+          layers.forEach((layer, layerIdx) => {
+            for (let i = 0; i < layer.count; i++) {
+              const t = i / (layer.count - 1);
+              const archX = side * (0.3 + Math.sin(t * Math.PI * 0.85) * 1.45);
+              const archY = 0.55 - t * 1.32 + Math.sin(t * Math.PI) * 0.34;
+              const archZ = layer.zOffset - Math.sin(t * Math.PI) * 0.24;
+              const lengthFactor = Math.sin(Math.pow(t, 0.7) * Math.PI * 0.88 + 0.15);
+              const featherScaleY = layer.minLen + (layer.maxLen - layer.minLen) * Math.max(0.2, lengthFactor);
+              const featherScaleX = 0.88 + (1 - t) * 0.45;
+              const fMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                emissive: colors[layer.colorType],
+                emissiveIntensity: layer.colorType === 'core' ? 0.55 : 0.38,
+                roughness: 0.25,
+                metalness: 0.2,
+                transparent: true,
+                opacity: layer.opacity
+              });
+              const feather = new THREE.Mesh(baseFeatherGeo, fMat);
+              feather.position.set(archX, archY, archZ);
+              const baseRotZ = side * (-0.35 - t * layer.spreadAngle);
+              const baseRotY = side * (0.25 + t * 0.2);
+              feather.rotation.set(0.1, baseRotY, baseRotZ);
+              feather.scale.set(featherScaleX, featherScaleY, 1);
+              wingRoot.add(feather);
+              wingFeathersData.push({ mesh: feather, side, t, layerIdx, baseRotZ, baseRotY });
+            }
+          });
+          return wingRoot;
+        }
+
+        const leftWing = buildWing(true);
+        const rightWing = buildWing(false);
+        wingsContainer.add(leftWing, rightWing);
+
+        const portal5DGroup = new THREE.Group();
+        portal5DGroup.position.set(0, 1.5, -2.5);
+        scene.add(portal5DGroup);
+        const magicRings = [];
+        [
+          { radius: 3.1, tube: 0.015, segments: 72, speedX: 0.2, speedY: 0.3, speedZ: 0.15, color: colors.primary },
+          { radius: 3.9, tube: 0.022, segments: 6, speedX: -0.15, speedY: 0.25, speedZ: -0.2, color: colors.secondary },
+          { radius: 4.7, tube: 0.012, segments: 72, speedX: 0.1, speedY: -0.18, speedZ: 0.25, color: colors.accent }
+        ].forEach(cfg => {
+          const mesh = new THREE.Mesh(new THREE.TorusGeometry(cfg.radius, cfg.tube, 8, cfg.segments), new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending }));
+          portal5DGroup.add(mesh);
+          magicRings.push({ mesh, ...cfg });
+        });
+
+        const shockwaveMesh = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.8, 40), new THREE.MeshBasicMaterial({ color: colors.primary, side: THREE.DoubleSide, transparent: true, opacity: 0, blending: THREE.AdditiveBlending }));
+        shockwaveMesh.rotation.x = -Math.PI / 2;
+        scene.add(shockwaveMesh);
+
+        const particleCount = isMini ? 420 : 900;
+        const particleGeo = new THREE.BufferGeometry();
+        const pPositions = new Float32Array(particleCount * 3);
+        const pBasePositions = new Float32Array(particleCount * 3);
+        const pColors = new Float32Array(particleCount * 3);
+        const pPhases = new Float32Array(particleCount);
+        for (let i = 0; i < particleCount; i++) {
+          const i3 = i * 3;
+          const radius = 1.1 + Math.pow(Math.random(), 1.3) * 8.5;
+          const theta = Math.random() * Math.PI * 2;
+          const y = (Math.random() - 0.45) * 8.5;
+          pPositions[i3] = pBasePositions[i3] = Math.cos(theta) * radius;
+          pPositions[i3 + 1] = pBasePositions[i3 + 1] = y;
+          pPositions[i3 + 2] = pBasePositions[i3 + 2] = Math.sin(theta) * radius;
+          pPhases[i] = Math.random() * Math.PI * 2;
+          const col = i % 3 === 0 ? colors.primary : (i % 3 === 1 ? colors.secondary : colors.accent);
+          pColors[i3] = col.r; pColors[i3 + 1] = col.g; pColors[i3 + 2] = col.b;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+        particleGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+        const particleSystem = new THREE.Points(particleGeo, new THREE.PointsMaterial({ size: isMini ? 0.24 : 0.2, map: sharedGlowTexture, vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+        scene.add(particleSystem);
+
+        const instanceState = { isMiracleActive: false, miracleProgress: 0, mouse: new THREE.Vector2(0, 0), targetMouse: new THREE.Vector2(0, 0) };
+        container.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          instanceState.targetMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          instanceState.targetMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        });
+
+        function triggerMiracle() { instanceState.isMiracleActive = true; instanceState.miracleProgress = 0.001; }
+        function handleResize() {
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          if (w > 0 && h > 0) {
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            composer.setSize(w, h);
+            bloomPass.setSize(w, h);
+          }
+        }
+        if ('ResizeObserver' in window) new ResizeObserver(handleResize).observe(container);
+        else window.addEventListener('resize', handleResize);
+
+        const clock = new THREE.Clock();
+        let customTime = 0;
+        function animate() {
+          requestAnimationFrame(animate);
+          if (container.offsetParent === null) return;
+          const delta = Math.min(clock.getDelta(), 0.05);
+          customTime += delta;
+          instanceState.mouse.lerp(instanceState.targetMouse, 0.08);
+          let miracleLift = 0, miracleWingBoost = 0;
+          if (instanceState.isMiracleActive) {
+            instanceState.miracleProgress += delta * 0.8;
+            if (instanceState.miracleProgress >= 1.0) {
+              instanceState.isMiracleActive = false;
+              instanceState.miracleProgress = 0;
+              shockwaveMesh.material.opacity = 0;
+              bloomPass.strength = 0.52;
+            } else {
+              const p = instanceState.miracleProgress;
+              miracleLift = Math.sin(p * Math.PI) * 1.15;
+              miracleWingBoost = Math.sin(p * Math.PI) * 0.45;
+              const scale = 1 + p * 16;
+              shockwaveMesh.scale.set(scale, scale, 1);
+              shockwaveMesh.position.y = angelGroup.position.y + 0.5;
+              shockwaveMesh.material.opacity = (1 - p) * 0.85;
+              bloomPass.strength = 0.52 + Math.sin(p * Math.PI) * 0.45;
+            }
+          }
+          angelGroup.position.y = Math.sin(customTime * 1.7) * 0.24 + miracleLift;
+          angelGroup.rotation.z = Math.sin(customTime * 0.85) * 0.04;
+          angelGroup.rotation.y = instanceState.mouse.x * 0.35;
+          angelGroup.rotation.x = -instanceState.mouse.y * 0.15;
+          haloGroup.rotation.z = customTime * 0.85;
+          haloOuter.rotation.z = -customTime * 1.4;
+          const pulse = 1 + Math.sin(customTime * 4.5) * 0.18;
+          heartCore.scale.set(pulse, pulse, pulse);
+          heartCore.rotation.y = customTime * 2.0;
+          leftArm.rotation.z = Math.sin(customTime * 1.6 - 0.5) * 0.12;
+          rightArm.rotation.z = -Math.sin(customTime * 1.6 - 0.5) * 0.12;
+          const mainFlap = Math.sin(customTime * 2.5) * (0.36 + miracleWingBoost);
+          leftWing.rotation.y = 0.25 + mainFlap;
+          rightWing.rotation.y = -0.25 - mainFlap;
+          wingFeathersData.forEach(item => {
+            const waveDelay = item.t * 1.6 + item.layerIdx * 0.25;
+            const ripple = Math.sin(customTime * 2.5 - waveDelay) * 0.14;
+            item.mesh.rotation.y = item.baseRotY + item.side * ripple;
+            item.mesh.rotation.z = item.baseRotZ + item.side * (ripple * 0.35);
+          });
+          const posArr = robeGeo.attributes.position.array;
+          for (let i = 0; i < posArr.length; i += 3) {
+            const bx = robeInitialPos[i], by = robeInitialPos[i + 1], bz = robeInitialPos[i + 2];
+            const distFromWaist = Math.abs(by) / robeHeight;
+            const angle = Math.atan2(bz, bx);
+            const wave = Math.sin(distFromWaist * 5.5 - customTime * 3.2 + angle * 3.0) * 0.16 * distFromWaist;
+            posArr[i] = bx + Math.cos(angle) * wave;
+            posArr[i + 1] = by;
+            posArr[i + 2] = bz + Math.sin(angle) * wave - 0.1 * distFromWaist;
+          }
+          robeGeo.attributes.position.needsUpdate = true;
+          robeGeo.computeVertexNormals();
+          magicRings.forEach(ring => { ring.mesh.rotation.x += delta * ring.speedX; ring.mesh.rotation.y += delta * ring.speedY; ring.mesh.rotation.z += delta * ring.speedZ; });
+          const pArr = particleGeo.attributes.position.array;
+          for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            const bx = pBasePositions[i3], by = pBasePositions[i3 + 1], bz = pBasePositions[i3 + 2];
+            const angle = customTime * 0.3 + pPhases[i] * 0.2;
+            pArr[i3] = bx * Math.cos(angle) - bz * Math.sin(angle);
+            pArr[i3 + 1] = by + Math.sin(customTime * 1.5 + pPhases[i]) * 0.4;
+            pArr[i3 + 2] = bx * Math.sin(angle) + bz * Math.cos(angle);
+          }
+          particleGeo.attributes.position.needsUpdate = true;
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = isMini ? 1.1 : 0.65;
+          controls.update();
+          composer.render();
+        }
+        animate();
+        return { triggerMiracle, handleResize };
+      } catch (err) {
+        container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center p-4 text-pink-200"><div class="text-4xl mb-2">👼</div><div class="text-xs font-semibold">Thiên Thần Hộ Mệnh Hera</div></div>`;
+        return null;
+      }
+    }
+
+    function initAngels5D() {
+      const heroStage = document.getElementById('heroCupidStage');
+      const zodiacStage = document.getElementById('zodiacCupidCompanion');
+      if (heroStage) { const h = createAngel5DInstance(heroStage, { isMini: false }); if (h) activeAngelControllers.push(h); }
+      if (zodiacStage) { const z = createAngel5DInstance(zodiacStage, { isMini: true }); if (z) activeAngelControllers.push(z); }
+    }
+    window.triggerAngel5DMiracle = () => activeAngelControllers.forEach(c => c?.triggerMiracle?.());
+    window.resizeAngels5D = () => activeAngelControllers.forEach(c => c?.handleResize?.());
+    if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initAngels5D);
+    else initAngels5D();
+  </script>
+
+  <!-- JAVASCRIPT LOGIC: TƯ VẤN HERA, XÁC THỰC DỮ LIỆU CHẶT CHẼ & CHỐNG NHẬP LINH TINH -->
+  <script>
+    const DEFAULT_USER_GEMINI_KEY = "AQ.Ab8RN6IpLPy2prdpXR4B9jzrOTpLrfQUfhvHp9nllv4q1cQpbw";
+    const STORAGE_KEY_API = "hera_gemini_api_key_v2";
+    const STORAGE_KEY_MODEL = "hera_gemini_model_v2";
+    const HERA_MIN_REQUEST_INTERVAL_MS = 1000;
+
+    function getConfiguredApiKey() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_API);
+        if (saved && saved.trim()) return saved.trim();
+      } catch (_) {}
+      return DEFAULT_USER_GEMINI_KEY;
+    }
+
+    function getConfiguredModel() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_MODEL);
+        if (saved && saved.trim()) return saved.trim();
+      } catch (_) {}
+      return "gemini-2.5-flash";
+    }
+
+    const appState = {
+      questionCount: 0,
+      soulCompatibility: 0,
+      flutterLevel: 0,
+      voiceInputEnabled: false,
+      chatHistory: [],
+      chatSessionToken: 0,
+      lastRequestTimestamp: 0,
+      isRequestInFlight: false,
+      lastZodiacSummary: '',
+      conversationContext: {
+        lastTopic: 'general',
+        partnerPronoun: 'người ấy',
+        turnCount: 0
+      }
+    };
+
+    /* ==========================================================================
+       HỆ THỐNG XÁC THỰC HỌ TÊN, NGÀY SINH & KIỂM TRA DỮ LIỆU GIẢ (FRONTEND + BACKEND)
+       ========================================================================== */
+    const VIETNAMESE_VOWELS_REGEX = /[aăâeêioôơuưyàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵ]/i;
+
+    const NONSENSE_NAME_PHRASES = [
+      'linh tinh', 'tao lao', 'xam xi', 'bay ba', 'vo danh', 'an danh',
+      'khong biet', 'ai biet', 'khong co', 'chua co', 'nguoi yeu', 'nguoi ay',
+      'ban trai', 'ban gai', 'vo chong', 'ho ten', 'ten that', 'nhap ten',
+      'vi du', 'abc xyz', 'nguyen van a', 'tran thi b', 'le van c', 'pham thi d',
+      'con cho', 'con meo', 'con lon', 'con bo', 'do ngoc', 'thang dien',
+      'con dien', 'sao cung duoc', 'gi cung duoc', 'test thu', 'thu nghiem',
+      'nhap dai', 'go dai', 'khong ten', 'chua dat ten', 'ten gia'
+    ];
+
+    const NONSENSE_NAME_TOKENS = new Set([
+      'abc', 'xyz', 'qwerty', 'qwert', 'asdf', 'asdfgh', 'zxcv', 'zxcvbn',
+      'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm', 'hjkl', 'fghj',
+      'test', 'testing', 'admin', 'user', 'guest', 'null', 'undefined', 'none',
+      'nan', 'fake', 'spam', 'bot', 'chatgpt', 'gemini', 'hera', 'haha',
+      'hihi', 'hehe', 'huhu', 'kaka', 'blabla', 'blah', 'xxx', 'yyy', 'zzz',
+      'aaa', 'bbb', 'ccc', 'ddd', 'eee', 'troll', 'clown', 'noname', 'unknown',
+      'demo', 'sample', 'dummy', 'temp', 'tmp', 'ok', 'oke', 'okay', 'no', 'yes'
+    ]);
+
+    // Nguồn dữ liệu đối chiếu nhân vật lịch sử / người nổi tiếng đã khuất (không suy đoán người bình thường)
+    const VERIFIED_DECEASED_PERSONS = [
+      'hồ chí minh', 'võ nguyên giáp', 'trịnh công sơn', 'xuân quỳnh', 'lưu quang vũ',
+      'hàn mặc tử', 'nam cao', 'ngô tất tố', 'tố hữu', 'xuân diệu', 'huy cận',
+      'võ thị sáu', 'nguyễn văn trỗi', 'đặng thùy trâm', 'nguyễn du', 'hồ xuân hương',
+      'bà huyện thanh quan', 'nguyễn trãi', 'trần hưng đạo', 'lê lợi', 'quang trung',
+      'nguyễn huệ', 'hai bà trưng', 'trưng trắc', 'trưng nhị', 'lý thường kiệt',
+      'albert einstein', 'steve jobs', 'michael jackson', 'marilyn monroe', 'elvis presley',
+      'princess diana', 'công nương diana', 'nữ hoàng elizabeth', 'queen elizabeth',
+      'kobe bryant', 'paul walker', 'chester bennington', 'avril', 'sulli', 'goo hara',
+      'jonghyun', 'moonbin', 'lee sun kyun', 'từ hy viên', 'barbie hsu', 'trương quốc vinh',
+      'leslie cheung', 'mai diễm phương', 'anita mui', 'lý tiểu long', 'bruce lee',
+      'đặng lệ quân', 'teresa teng', 'huỳnh gia câu', 'wong ka kui', 'châu tinh trì'
+    ];
+    // Lưu ý: Loại bỏ người còn sống khỏi danh sách trên
+    const KNOWN_LIVING_EXCEPTIONS = new Set(['châu tinh trì']);
+
+    function stripVietnameseAccents(str) {
+      return String(str ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase()
+        .trim();
+    }
+
+    function capitalizeVietnameseName(cleanedName) {
+      return cleanedName
+        .split(' ')
+        .map(w => w.charAt(0).toLocaleUpperCase('vi-VN') + w.slice(1).toLocaleLowerCase('vi-VN'))
+        .join(' ');
+    }
+
+    function validateFullName(rawName) {
+      const trimmed = String(rawName ?? '').replace(/\s+/g, ' ').trim();
+      if (!trimmed) {
+        return { valid: false, reason: 'Vui lòng nhập họ và tên thật (không được để trống).' };
+      }
+      if (/\d/.test(trimmed)) {
+        return { valid: false, reason: 'Họ tên không được chứa chữ số. Vui lòng nhập họ và tên thật.' };
+      }
+      if (!/^[\p{L}\s]+$/u.test(trimmed)) {
+        return { valid: false, reason: 'Họ tên không được chứa ký tự đặc biệt. Vui lòng nhập họ và tên thật.' };
+      }
+
+      const words = trimmed.split(' ');
+      if (words.length < 2) {
+        return { valid: false, reason: 'Vui lòng nhập đầy đủ cả họ và tên (ít nhất 2 từ, ví dụ: Nguyễn An Nhiên).' };
+      }
+      if (words.length > 6) {
+        return { valid: false, reason: 'Họ tên quá dài hoặc không đúng cấu trúc tên người. Vui lòng kiểm tra lại.' };
+      }
+
+      const plainFull = stripVietnameseAccents(trimmed);
+      for (const phrase of NONSENSE_NAME_PHRASES) {
+        if (plainFull === phrase || plainFull.includes(` ${phrase}`) || plainFull.includes(`${phrase} `)) {
+          return { valid: false, reason: 'Họ tên bạn nhập là cụm từ giả định/không hợp lệ. Vui lòng nhập họ và tên thật.' };
+        }
+      }
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const plainWord = stripVietnameseAccents(word);
+
+        if (word.length === 1 && plainWord !== 'y') {
+          return { valid: false, reason: 'Họ tên không được dùng chữ cái viết tắt đơn lẻ (ví dụ: A, B, X). Vui lòng nhập tên đầy đủ.' };
+        }
+        if (word.length > 12) {
+          return { valid: false, reason: 'Từ trong họ tên dài bất thường. Vui lòng nhập họ và tên thật.' };
+        }
+        if (NONSENSE_NAME_TOKENS.has(plainWord)) {
+          return { valid: false, reason: `Từ "${word}" không phải tên người hợp lệ. Vui lòng nhập họ và tên thật.` };
+        }
+        if (/(.)\1{2,}/iu.test(word)) {
+          return { valid: false, reason: 'Họ tên chứa ký tự lặp lại vô nghĩa. Vui lòng nhập họ và tên thật.' };
+        }
+        if (!VIETNAMESE_VOWELS_REGEX.test(word)) {
+          return { valid: false, reason: `Từ "${word}" thiếu nguyên âm và không phải tên người hợp lệ. Vui lòng nhập họ và tên thật.` };
+        }
+        // Chặn chuỗi phụ âm gõ phím bừa bãi như yueghbds (ghbds = 5 phụ âm liền nhau)
+        if (/[^aeiouy]{4,}/.test(plainWord)) {
+          return { valid: false, reason: `Từ "${word}" chứa tổ hợp phụ âm ngẫu nhiên không có nghĩa. Vui lòng nhập họ và tên thật.` };
+        }
+        // Chặn 3 phụ âm đứng cuối từ (ví dụ: bds, ghj, zxc, qwe)
+        if (/[^aeiouy]{3,}$/.test(plainWord)) {
+          return { valid: false, reason: `Từ "${word}" có cấu trúc chữ cái không hợp lệ. Vui lòng nhập họ và tên thật.` };
+        }
+        // Chặn 2 từ đứng cạnh nhau giống hệt nhau (VD: Nguyễn Nguyễn, An An)
+        if (i > 0 && stripVietnameseAccents(words[i - 1]) === plainWord) {
+          return { valid: false, reason: 'Họ tên có từ lặp lại bất thường. Vui lòng kiểm tra và nhập họ và tên thật.' };
+        }
+      }
+
+      return {
+        valid: true,
+        normalized: capitalizeVietnameseName(trimmed)
+      };
+    }
+
+    function isLeapYear(year) {
+      return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    function validateDateOfBirth(rawDob) {
+      const cleaned = String(rawDob ?? '').trim();
+      if (!cleaned) {
+        return { valid: false, reason: 'Vui lòng nhập ngày tháng năm sinh theo định dạng DD/MM/YYYY.' };
+      }
+
+      const match = cleaned.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+      if (!match) {
+        return { valid: false, reason: 'Ngày sinh không đúng định dạng DD/MM/YYYY (ví dụ: 14/02/2000).' };
+      }
+
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10);
+      const year = parseInt(match[3], 10);
+
+      if (month < 1 || month > 12) {
+        return { valid: false, reason: 'Tháng sinh không hợp lệ (chỉ chấp nhận từ tháng 01 đến 12).' };
+      }
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+
+      if (year > currentYear) {
+        return { valid: false, reason: 'Ngày sinh không thể nằm trong tương lai. Bạn hãy kiểm tra lại nhé.' };
+      }
+      if (year < 1930) {
+        return { valid: false, reason: 'Năm sinh nằm ngoài giới hạn hỗ trợ thực tế (1930 – hiện tại). Vui lòng nhập năm sinh thật.' };
+      }
+
+      const daysInMonth = [
+        31,
+        isLeapYear(year) ? 29 : 28,
+        31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+      ];
+
+      if (day < 1 || day > daysInMonth[month - 1]) {
+        const leapNote = month === 2
+          ? (isLeapYear(year) ? ` (tháng 2 năm nhuận ${year} chỉ có tối đa 29 ngày)` : ` (năm ${year} không phải năm nhuận nên tháng 2 chỉ có 28 ngày)`)
+          : ` (tháng ${month} chỉ có tối đa ${daysInMonth[month - 1]} ngày)`;
+        return {
+          valid: false,
+          reason: `Ngày ${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} không tồn tại trên lịch${leapNote}.`
+        };
+      }
+
+      const dobDate = new Date(year, month - 1, day);
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (dobDate > todayMidnight) {
+        return { valid: false, reason: 'Ngày sinh không thể nằm trong tương lai. Bạn hãy kiểm tra lại nhé.' };
+      }
+
+      let age = currentYear - year;
+      const monthDiff = (now.getMonth() + 1) - month;
+      if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < day)) {
+        age -= 1;
+      }
+
+      if (age < 13) {
+        return { valid: false, reason: 'Hệ thống tư vấn tình cảm chỉ hỗ trợ người từ 13 tuổi trở lên. Vui lòng kiểm tra lại năm sinh.' };
+      }
+
+      const normalizedDob = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+      return {
+        valid: true,
+        day,
+        month,
+        year,
+        age,
+        normalized: normalizedDob
+      };
+    }
+
+    function checkDeceasedStatus(fullName, contextText = '') {
+      const plainName = stripVietnameseAccents(fullName);
+      if (!KNOWN_LIVING_EXCEPTIONS.has(plainName)) {
+        for (const deceased of VERIFIED_DECEASED_PERSONS) {
+          if (plainName === stripVietnameseAccents(deceased)) {
+            return {
+              isDeceased: true,
+              reason: `"${fullName}" là nhân vật lịch sử / người nổi tiếng đã qua đời nên hệ thống không xử lý như hồ sơ cặp đôi đang sống.`
+            };
+          }
+        }
+      }
+
+      const combined = `${plainName} ${stripVietnameseAccents(contextText)}`;
+      if (/\b(da mat|qua doi|da khuat|nguoi khuat|tu tran|hy sinh|mat roi|da chet)\b/.test(combined)) {
+        return {
+          isDeceased: true,
+          reason: 'Hệ thống ghi nhận thông tin liên quan đến người đã khuất nên không thể phân tích như hồ sơ cặp đôi đang sống.'
+        };
+      }
+
+      return { isDeceased: false };
+    }
+
+    function validatePersonProfile(rawName, rawDob, labelPrefix = '') {
+      const nameCheck = validateFullName(rawName);
+      if (!nameCheck.valid) {
+        return { valid: false, field: 'name', reason: `${labelPrefix}${nameCheck.reason}` };
+      }
+
+      const deceasedCheck = checkDeceasedStatus(nameCheck.normalized);
+      if (deceasedCheck.isDeceased) {
+        return { valid: false, field: 'name', reason: `${labelPrefix}${deceasedCheck.reason}` };
+      }
+
+      const dobCheck = validateDateOfBirth(rawDob);
+      if (!dobCheck.valid) {
+        return { valid: false, field: 'dob', reason: `${labelPrefix}${dobCheck.reason}` };
+      }
+
+      return {
+        valid: true,
+        name: nameCheck.normalized,
+        dob: dobCheck
+      };
+    }
+
+    // Backend/API Guard: kiểm tra tin nhắn chat có chứa thông tin giả/ngày sinh sai trước khi gọi API
+    function inspectChatMessageBeforeApi(message) {
+      const text = String(message ?? '').trim();
+
+      // 1. Kiểm tra các chuỗi ngày tháng dạng DD/MM/YYYY hoặc D/M/YYYY xuất hiện trong tin nhắn
+      const dateMatches = text.match(/\b\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}\b/g);
+      if (dateMatches) {
+        for (const token of dateMatches) {
+          const check = validateDateOfBirth(token);
+          if (!check.valid) {
+            return {
+              blocked: true,
+              reply: `Ngày sinh **${token}** bạn vừa nhập không hợp lệ (${check.reason}). Bạn vui lòng kiểm tra và nhập lại ngày sinh có thật theo định dạng DD/MM/YYYY nhé.`
+            };
+          }
+        }
+      }
+
+      // 2. Nếu người dùng đang nhờ xem cung hoàng đạo / tử vi / bói tên trong khung chat kèm tên rác
+      const isZodiacQuery = /(cung hoang dao|cung hoàng đạo|xem tuoi|xem tuổi|hop nhau|hợp nhau|boi tinh yeu|bói tình yêu|ten la|tên là)/i.test(text);
+      if (isZodiacQuery) {
+        const nameAfterPrefix = text.match(/(?:tên là|ten la|mình là|minh la|người ấy là|nguoi ay la)\s+([^\d,.;!?]{2,40})/i);
+        if (nameAfterPrefix && nameAfterPrefix[1]) {
+          const candidate = nameAfterPrefix[1].trim();
+          const nameCheck = validateFullName(candidate);
+          if (!nameCheck.valid) {
+            return {
+              blocked: true,
+              reply: `Họ tên **${candidate}** bạn nhập chưa hợp lệ (${nameCheck.reason}). Bạn hãy nhập họ và tên thật để mình hỗ trợ chính xác nhé.`
+            };
+          }
+        }
+      }
+
+      return { blocked: false };
+    }
+
+    /* ==========================================================================
+       TIỆN ÍCH THÔNG BÁO TOAST & AN TOÀN HTML
+       ========================================================================== */
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto px-4 py-2.5 rounded-2xl border border-pink-400/45 bg-[#24202b]/95 text-pink-100 shadow-2xl backdrop-blur-xl text-xs sm:text-sm font-medium flex items-center gap-2 transition-all duration-300 translate-x-4 opacity-0';
+      toast.innerHTML = `<span class="text-pink-400">✨</span><span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-x-4', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-x-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = String(str ?? '');
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    /* ==========================================================================
+       HIỆU ỨNG CON TRỎ TRÁI TIM, BẮN TIM KHI CLICK & CANVAS NỀN
+       ========================================================================== */
+    function initVisualEffects() {
+      const cursor = document.getElementById('heartCursor');
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (cursor) {
+          cursor.style.left = mouseX + 'px';
+          cursor.style.top = mouseY + 'px';
+        }
+      }, { passive: true });
+
+      window.addEventListener('mousedown', () => cursor?.classList.add('clicking'), { passive: true });
+      window.addEventListener('mouseup', () => cursor?.classList.remove('clicking'), { passive: true });
+
+      const heartEmojis = ['💖', '💗', '💓', '💕', '✨', '🩷'];
+      document.addEventListener('click', (e) => {
+        const x = e.clientX || mouseX;
+        const y = e.clientY || mouseY;
+        const count = 6;
+
+        for (let i = 0; i < count; i++) {
+          const particle = document.createElement('span');
+          particle.className = 'click-heart-particle';
+          particle.textContent = heartEmojis[i % heartEmojis.length];
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+          const dist = 36 + Math.random() * 44;
+          particle.style.left = x + 'px';
+          particle.style.top = y + 'px';
+          particle.style.setProperty('--tx', `${(Math.cos(angle) * dist).toFixed(1)}px`);
+          particle.style.setProperty('--ty', `${(Math.sin(angle) * dist - 18).toFixed(1)}px`);
+          particle.style.setProperty('--rot', `${((Math.random() - 0.5) * 60).toFixed(1)}deg`);
+          document.body.appendChild(particle);
+          setTimeout(() => particle.remove(), 980);
+        }
+      });
+
+      const canvas = document.getElementById('bgLoveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = 0;
+      let height = 0;
+      let particles = [];
+
+      function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+
+      function createParticles() {
+        const total = Math.min(44, Math.floor((window.innerWidth * window.innerHeight) / 28000));
+        particles = [];
+        for (let i = 0; i < total; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: 3 + Math.random() * 7,
+            speedY: 0.25 + Math.random() * 0.55,
+            speedX: (Math.random() - 0.5) * 0.35,
+            alpha: 0.2 + Math.random() * 0.5,
+            twinkleSpeed: 0.015 + Math.random() * 0.025,
+            phase: Math.random() * Math.PI * 2,
+            isHeart: i % 3 === 0
+          });
+        }
+      }
+
+      function drawHeartShape(x, y, size, alpha) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 14, size / 14);
+        ctx.beginPath();
+        ctx.moveTo(0, 4);
+        ctx.bezierCurveTo(0, 0, -7, -4, -7, 1);
+        ctx.bezierCurveTo(-7, 5, 0, 9, 0, 12);
+        ctx.bezierCurveTo(0, 9, 7, 5, 7, 1);
+        ctx.bezierCurveTo(7, -4, 0, 0, 0, 4);
+        ctx.fillStyle = `rgba(244, 114, 182, ${alpha})`;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function animateBg() {
+        ctx.clearRect(0, 0, width, height);
+        for (const p of particles) {
+          p.y -= p.speedY;
+          p.x += p.speedX;
+          p.phase += p.twinkleSpeed;
+          const currentAlpha = Math.max(0.08, p.alpha + Math.sin(p.phase) * 0.2);
+
+          if (p.y < -20) { p.y = height + 20; p.x = Math.random() * width; }
+          if (p.x < -20) p.x = width + 20;
+          if (p.x > width + 20) p.x = -20;
+
+          if (p.isHeart) {
+            drawHeartShape(p.x, p.y, p.size, currentAlpha);
+          } else {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.32, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(253, 224, 240, ${currentAlpha})`;
+            ctx.fill();
+          }
+        }
+        requestAnimationFrame(animateBg);
+      }
+
+      window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
+      resizeCanvas();
+      createParticles();
+      animateBg();
+    }
+
+    /* ==========================================================================
+       CHỦ ĐỀ TƯ VẤN TÂM LÝ & GỢI Ý NHANH
+       ========================================================================== */
+    const loveTopics = [
+      {
+        icon: '💌',
+        title: 'Bật đèn xanh cho Crush',
+        desc: 'Cách mở lời tinh tế, tự nhiên và quan sát mức độ hồi đáp của đối phương.',
+        prompt: 'Mình đang thích một người nhưng chưa biết bắt chuyện sao cho tự nhiên. Mình nên mở lời thế nào?'
+      },
+      {
+        icon: '🌫️',
+        title: 'Mối quan hệ mập mờ',
+        desc: 'Nhận diện nhu cầu gắn bó và cách xác lập ranh giới, danh phận rõ ràng.',
+        prompt: 'Mình và người ấy quan tâm nhau như người yêu suốt 3 tháng nay nhưng chưa rõ danh phận. Mình nên làm gì?'
+      },
+      {
+        icon: '🩹',
+        title: 'Hàn gắn sau xung đột',
+        desc: 'Giao tiếp phi bạo lực, thấu hiểu cảm xúc hai phía và hóa giải hiểu lầm.',
+        prompt: 'Tụi mình vừa cãi nhau và đang im lặng. Làm sao để mở lời làm hòa mà vẫn giữ sự tôn trọng?'
+      },
+      {
+        icon: '🕊️',
+        title: 'Chữa lành sau chia tay',
+        desc: 'Chấp nhận nỗi buồn, tách rời ký ức cũ và khôi phục giá trị bản thân.',
+        prompt: 'Mình mới chia tay nên vẫn còn hụt hẫng và hay nhớ người cũ. Mình nên làm gì để vượt qua?'
+      },
+      {
+        icon: '✈️',
+        title: 'Duy trì kết nối khi yêu xa',
+        desc: 'Xây dựng niềm tin an toàn và ngôn ngữ tình yêu phù hợp qua khoảng cách.',
+        prompt: 'Tụi mình đang yêu xa và dạo này nói chuyện nhạt dần vì bận. Có cách nào kết nối lại không?'
+      },
+      {
+        icon: '💍',
+        title: 'Tiến tới cam kết & Hôn nhân',
+        desc: 'Đối thoại thẳng thắn về giá trị sống, tài chính và kế hoạch tương lai chung.',
+        prompt: 'Tụi mình yêu lâu rồi nhưng người ấy hay né tránh chuyện tương lai. Mình nên trao đổi thế nào?'
+      },
+      {
+        icon: '🚩',
+        title: 'Nhận diện Red Flags & Thao túng',
+        desc: 'Phân biệt mâu thuẫn bình thường với hành vi kiểm soát, gaslighting độc hại.',
+        prompt: 'Mỗi lần mình góp ý là người ấy lại nổi nóng và đổ lỗi ngược cho mình. Đây có phải dấu hiệu độc hại không?'
+      },
+      {
+        icon: '🪞',
+        title: 'Kiểu gắn bó lo âu & Yêu bản thân',
+        desc: 'Xoa dịu nỗi sợ bị bỏ rơi (Overthinking) và xây dựng nền tảng tự tôn vững vàng.',
+        prompt: 'Mình hay suy nghĩ nhiều và bất an mỗi khi người yêu trả lời tin nhắn chậm. Làm sao để bớt overthinking?'
+      }
+    ];
+
+    function renderTopicCards() {
+      const grid = document.getElementById('topicCardsGrid');
+      if (!grid) return;
+      grid.innerHTML = loveTopics.map((topic, idx) => `
+        <button type="button" onclick="startTopicConsultation(${idx})"
+          class="text-left group rounded-3xl bg-[#24202b]/90 hover:bg-[#342f3d]/95 border border-pink-500/20 hover:border-pink-400/50 p-5 transition-all duration-300 shadow-lg hover:shadow-pink-500/20 hover:-translate-y-1">
+          <div class="w-11 h-11 rounded-2xl bg-pink-500/15 border border-pink-400/30 flex items-center justify-center text-xl mb-3.5 group-hover:scale-110 transition-transform">
+            ${topic.icon}
+          </div>
+          <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-pink-200 transition-colors">${escapeHtml(topic.title)}</h3>
+          <p class="text-xs text-pink-100/70 mt-1.5 leading-relaxed">${escapeHtml(topic.desc)}</p>
+          <div class="mt-3.5 text-[11px] font-semibold text-pink-300 flex items-center gap-1">
+            <span>Tâm sự cùng Hera</span>
+            <span class="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function renderQuickChips(customChips) {
+      const container = document.getElementById('quickChipsContainer');
+      if (!container) return;
+      const defaults = [
+        'Người yêu dạo này lạnh nhạt thì phải làm sao?',
+        'Mập mờ 3 tháng nên hỏi thẳng thế nào?',
+        'Cách nhắn tin bắt chuyện với crush tự nhiên',
+        'Làm sao để bớt overthinking khi yêu?'
+      ];
+      const list = Array.isArray(customChips) && customChips.length ? customChips : defaults;
+      container.innerHTML = list.map(text => `
+        <button type="button" data-prompt="${escapeAttr(text)}" onclick="sendQuickChipPrompt(this)"
+          class="shrink-0 px-3 py-1 rounded-full bg-white/5 hover:bg-pink-500/20 border border-pink-400/25 text-[11px] text-pink-100/90 transition-colors">
+          ${escapeHtml(text)}
+        </button>
+      `).join('');
+    }
+
+    function sendQuickChipPrompt(btn) {
+      const prompt = btn?.getAttribute('data-prompt') || '';
+      if (!prompt || !chatInput) return;
+      chatInput.value = prompt;
+      sendUserMessage();
+    }
+
+    function startTopicConsultation(index) {
+      const topic = loveTopics[index];
+      if (!topic) return;
+      openLoveModal();
+      if (chatInput) {
+        chatInput.value = topic.prompt;
+        sendUserMessage();
+      }
+    }
+
+    function initHeaderSearch() {
+      const input = document.getElementById('headerTopicSearch');
+      const dropdown = document.getElementById('headerSearchDropdown');
+      if (!input || !dropdown) return;
+
+      input.addEventListener('input', () => {
+        const kw = input.value.trim().toLowerCase();
+        if (!kw) { dropdown.classList.add('hidden'); return; }
+        const matched = loveTopics.filter(t => t.title.toLowerCase().includes(kw) || t.desc.toLowerCase().includes(kw));
+        if (matched.length === 0) {
+          dropdown.innerHTML = `<div class="p-3 text-xs text-pink-200/70">Không tìm thấy chủ đề khớp. Nhấn Enter để tâm sự trực tiếp cùng Hera!</div>`;
+        } else {
+          dropdown.innerHTML = matched.map((t) => {
+            const realIdx = loveTopics.indexOf(t);
+            return `
+              <button type="button" onclick="startTopicConsultation(${realIdx}); document.getElementById('headerSearchDropdown').classList.add('hidden');"
+                class="w-full text-left px-3.5 py-2.5 hover:bg-pink-500/20 border-b border-white/5 last:border-none flex items-center gap-2.5 text-xs">
+                <span>${t.icon}</span>
+                <div>
+                  <div class="font-bold text-white">${escapeHtml(t.title)}</div>
+                  <div class="text-[11px] text-pink-200/70 truncate">${escapeHtml(t.desc)}</div>
+                </div>
+              </button>
+            `;
+          }).join('');
+        }
+        dropdown.classList.remove('hidden');
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          const val = input.value.trim();
+          input.value = '';
+          dropdown.classList.add('hidden');
+          openLoveModal();
+          if (chatInput) { chatInput.value = val; sendUserMessage(); }
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
+      });
+    }
+
+    /* ==========================================================================
+       ĐIỀU KHIỂN MODAL & CÀI ĐẶT GEMINI API KEY
+       ========================================================================== */
+    function updateAiEngineBadge() {
+      const label = document.getElementById('heraEngineStatusLabel');
+      if (!label) return;
+      const model = getConfiguredModel();
+      label.textContent = `Sẵn sàng • Hera AI (${model})`;
+    }
+
+    function openAiSettingsModal() {
+      const modal = document.getElementById('aiSettingsModal');
+      const keyInput = document.getElementById('geminiApiKeyInput');
+      const modelSelect = document.getElementById('geminiModelSelect');
+      if (keyInput) keyInput.value = getConfiguredApiKey();
+      if (modelSelect) modelSelect.value = getConfiguredModel();
+      modal?.classList.remove('hidden');
+    }
+
+    function closeAiSettingsModal() {
+      document.getElementById('aiSettingsModal')?.classList.add('hidden');
+    }
+
+    function saveAiSettings() {
+      const keyVal = document.getElementById('geminiApiKeyInput')?.value.trim() || '';
+      const modelVal = document.getElementById('geminiModelSelect')?.value || 'gemini-2.5-flash';
+      try {
+        if (keyVal) localStorage.setItem(STORAGE_KEY_API, keyVal);
+        else localStorage.removeItem(STORAGE_KEY_API);
+        localStorage.setItem(STORAGE_KEY_MODEL, modelVal);
+      } catch (_) {}
+      updateAiEngineBadge();
+      closeAiSettingsModal();
+      showToast('✨ Đã lưu cấu hình kết nối Gemini AI!');
+    }
+
+    function clearAiSettings() {
+      try {
+        localStorage.removeItem(STORAGE_KEY_API);
+        localStorage.removeItem(STORAGE_KEY_MODEL);
+      } catch (_) {}
+      updateAiEngineBadge();
+      closeAiSettingsModal();
+      showToast('Đã khôi phục cấu hình mặc định của Hera.');
+    }
+
+    function openLoveModal() {
+      document.getElementById('loveCounselingModal')?.classList.remove('hidden');
+      setTimeout(() => document.getElementById('chatInput')?.focus(), 100);
+    }
+
+    function closeLoveModal() {
+      stopUserVoiceRecognition(true);
+      document.getElementById('loveCounselingModal')?.classList.add('hidden');
+    }
+
+    function openZodiacModal() {
+      document.getElementById('zodiacCoupleModal')?.classList.remove('hidden');
+      setTimeout(() => {
+        if (typeof window.resizeAngels5D === 'function') window.resizeAngels5D();
+      }, 60);
+    }
+
+    function closeZodiacModal() {
+      document.getElementById('zodiacCoupleModal')?.classList.add('hidden');
+    }
+
+    function switchModal(fromId, toId) {
+      if (fromId === 'loveCounselingModal') stopUserVoiceRecognition(true);
+      document.getElementById(fromId)?.classList.add('hidden');
+      document.getElementById(toId)?.classList.remove('hidden');
+      if (toId === 'zodiacCoupleModal' && typeof window.resizeAngels5D === 'function') {
+        setTimeout(() => window.resizeAngels5D(), 60);
+      }
+    }
+
+    /* ==========================================================================
+       VOICE CHAT CỦA NGƯỜI DÙNG (CHỈ THU ÂM GIỌNG NÓI NGƯỜI DÙNG — KHÔNG ĐỌC AI)
+       ========================================================================== */
+    const voiceInputToggleBtn = document.getElementById('voiceInputToggleBtn');
+    const voiceListeningHint = document.getElementById('voiceListeningHint');
+    let userSpeechRecognition = null;
+    let isUserRecognizing = false;
+    let userVoiceSilenceTimer = null;
+    let userFinalTranscript = '';
+    let userInterimTranscript = '';
+
+    function updateVoiceInputUI() {
+      if (!voiceInputToggleBtn) return;
+      if (appState.voiceInputEnabled) {
+        voiceInputToggleBtn.className = 'voice-active-pulse px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 border border-rose-300/60 text-white font-bold text-xs flex items-center gap-1.5 transition-all';
+        voiceInputToggleBtn.innerHTML = '<span>🔴 Đang bật Voice chat</span>';
+        voiceListeningHint?.classList.remove('hidden');
+      } else {
+        voiceInputToggleBtn.className = 'px-3 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/35 text-pink-100 font-semibold text-xs flex items-center gap-1.5 transition-all';
+        voiceInputToggleBtn.innerHTML = '<span>🎙️ Voice chat</span>';
+        voiceListeningHint?.classList.add('hidden');
+      }
+    }
+
+    function flushUserSpokenMessage() {
+      if (userVoiceSilenceTimer) { clearTimeout(userVoiceSilenceTimer); userVoiceSilenceTimer = null; }
+      const combinedText = `${userFinalTranscript} ${userInterimTranscript}`.trim();
+      userFinalTranscript = '';
+      userInterimTranscript = '';
+      if (!combinedText) return;
+
+      if (userSpeechRecognition && isUserRecognizing) {
+        try { userSpeechRecognition.abort(); } catch (_) {}
+        isUserRecognizing = false;
+      }
+
+      if (chatInput) {
+        chatInput.value = combinedText;
+        sendUserMessage();
+      }
+    }
+
+    function startUserVoiceRecognition() {
+      if (!appState.voiceInputEnabled) return;
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        appState.voiceInputEnabled = false;
+        updateVoiceInputUI();
+        showToast('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói trực tiếp.');
+        return;
+      }
+
+      if (userSpeechRecognition) { try { userSpeechRecognition.abort(); } catch (_) {} }
+      userSpeechRecognition = new SpeechRec();
+      userSpeechRecognition.lang = 'vi-VN';
+      userSpeechRecognition.continuous = true;
+      userSpeechRecognition.interimResults = true;
+
+      userSpeechRecognition.onstart = () => { isUserRecognizing = true; updateVoiceInputUI(); };
+      userSpeechRecognition.onresult = (event) => {
+        let interim = '';
+        let hasFinal = false;
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0]?.transcript || '';
+          if (event.results[i].isFinal) { userFinalTranscript = `${userFinalTranscript} ${transcript}`.trim(); hasFinal = true; }
+          else interim += transcript;
+        }
+        userInterimTranscript = interim.trim();
+        const preview = `${userFinalTranscript} ${userInterimTranscript}`.trim();
+        if (chatInput && preview) chatInput.value = preview;
+
+        if (userVoiceSilenceTimer) clearTimeout(userVoiceSilenceTimer);
+        if (preview) {
+          userVoiceSilenceTimer = setTimeout(flushUserSpokenMessage, hasFinal && !userInterimTranscript ? 1500 : 2100);
+        }
+      };
+
+      userSpeechRecognition.onerror = (event) => {
+        isUserRecognizing = false;
+        if (event?.error === 'not-allowed') {
+          appState.voiceInputEnabled = false;
+          updateVoiceInputUI();
+          showToast('Bạn chưa cấp quyền sử dụng micro cho trình duyệt.');
+        }
+      };
+
+      userSpeechRecognition.onend = () => {
+        isUserRecognizing = false;
+        if (`${userFinalTranscript} ${userInterimTranscript}`.trim() && appState.voiceInputEnabled) {
+          flushUserSpokenMessage();
+          return;
+        }
+        if (appState.voiceInputEnabled) {
+          setTimeout(() => {
+            if (appState.voiceInputEnabled && !isUserRecognizing) {
+              try { userSpeechRecognition.start(); } catch (_) {}
+            }
+          }, 400);
+        }
+      };
+
+      try { userSpeechRecognition.start(); } catch (_) {}
+    }
+
+    function stopUserVoiceRecognition(disableState = true) {
+      if (userVoiceSilenceTimer) { clearTimeout(userVoiceSilenceTimer); userVoiceSilenceTimer = null; }
+      userFinalTranscript = '';
+      userInterimTranscript = '';
+      if (userSpeechRecognition) { try { userSpeechRecognition.abort(); } catch (_) {} }
+      isUserRecognizing = false;
+      if (disableState) appState.voiceInputEnabled = false;
+      updateVoiceInputUI();
+    }
+
+    voiceInputToggleBtn?.addEventListener('click', () => {
+      appState.voiceInputEnabled = !appState.voiceInputEnabled;
+      if (appState.voiceInputEnabled) {
+        updateVoiceInputUI();
+        showToast('Đã bật Voice chat! Hãy nói điều bạn muốn chia sẻ, nói xong tin nhắn sẽ tự gửi 🎙️');
+        startUserVoiceRecognition();
+      } else {
+        stopUserVoiceRecognition(true);
+        showToast('Đã tắt Voice chat 🔇');
+      }
+    });
+
+    /* ==========================================================================
+       LÀM MỚI ĐOẠN CHAT & KHỞI TẠO HỘI THOẠI
+       ========================================================================== */
+    const chatMessagesContainer = document.getElementById('chatMessagesContainer');
+    const chatInput = document.getElementById('chatInput');
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+
+    function renderInitialHeraGreeting() {
+      if (!chatMessagesContainer) return;
+      chatMessagesContainer.innerHTML = `
+        <div class="flex items-start gap-3 max-w-2xl">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-sm shrink-0 shadow-md">
+            💗
+          </div>
+          <div class="bg-[#342f3d]/90 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3 text-xs sm:text-sm text-pink-50 leading-relaxed shadow-md">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-[11px] font-semibold text-pink-200 mb-2">
+              <span>Hera • Chuyên gia Tâm lý & Mối quan hệ</span>
+            </div>
+            <p>
+              Chào bạn, mình là <strong class="text-pink-200 font-semibold">Hera</strong>. Bạn đang gặp vướng mắc gì trong chuyện tình cảm hay các mối quan hệ? Cứ chia sẻ ngắn gọn điều bạn đang băn khoăn, mình sẽ giúp bạn tìm hướng xử lý phù hợp.
+            </p>
+          </div>
+        </div>
+      `;
+      renderQuickChips();
+    }
+
+    function resetChatConversation() {
+      appState.chatSessionToken += 1;
+      appState.chatHistory = [];
+      appState.questionCount = 0;
+      appState.soulCompatibility = 0;
+      appState.flutterLevel = 0;
+      appState.isRequestInFlight = false;
+      appState.conversationContext = { lastTopic: 'general', partnerPronoun: 'người ấy', turnCount: 0 };
+
+      document.getElementById('modalSoulScore').textContent = '0%';
+      document.getElementById('modalFlutterScore').textContent = '0%';
+      document.getElementById('heroCompatScore').textContent = '0%';
+      document.getElementById('heroMatchBar1').style.width = '12%';
+      document.getElementById('heroMatchBar2').style.width = '18%';
+
+      if (chatInput) { chatInput.value = ''; chatInput.focus(); }
+      if (sendMessageBtn) sendMessageBtn.disabled = false;
+
+      const resetIcon = document.getElementById('resetChatIcon');
+      if (resetIcon) {
+        resetIcon.classList.remove('spin-refresh-icon');
+        void resetIcon.offsetWidth;
+        resetIcon.classList.add('spin-refresh-icon');
+      }
+
+      renderInitialHeraGreeting();
+      showToast('✨ Đã làm mới đoạn chat và mở cuộc trò chuyện mới cùng Hera!');
+    }
+
+    document.getElementById('resetChatBtn')?.addEventListener('click', resetChatConversation);
+
+    /* ==========================================================================
+       BỘ NÃO TƯ VẤN TÂM LÝ HERA: HIỂU ĐÚNG Ý, LIỀN MẠCH, ƯU TIÊN GIẢI PHÁP
+       ========================================================================== */
+    const HERA_SYSTEM_PROMPT = `Bạn là Hera, chuyên gia tư vấn tâm lý và mối quan hệ thông minh, giao tiếp tự nhiên, tinh tế và giải quyết vấn đề hiệu quả.
+
+TIÊU CHUẨN PHẢN HỒI BẮT BUỘC
+1. Hiểu đúng ý & bám sát ngữ cảnh:
+- Đọc trọn vẹn tin nhắn và lịch sử hội thoại trước khi trả lời; hiểu từ viết tắt, tiếng lóng (ny, nyc, ko, dc, ib, rep, ngta, trap, ghost, mập mờ, overthinking...) và lỗi gõ thiếu dấu.
+- Trả lời đúng trọng tâm câu hỏi hiện tại, không suy diễn khi thiếu dữ kiện; nếu cần làm rõ chỉ hỏi đúng 1 câu ngắn.
+2. Cấu trúc cốt lõi (Hiểu vấn đề → Giải pháp → Cách thực hiện):
+- Đi thẳng vào trọng tâm ngay từ chữ đầu tiên, tuyệt đối không dùng câu mở đầu sáo rỗng ("Cảm ơn bạn đã chia sẻ...", "Mình hiểu cảm giác...").
+- Hạn chế lý thuyết và an ủi dài dòng; ưu tiên 1 phương án hành động cụ thể, thực tế nhất để người dùng biết bước tiếp theo cần làm gì.
+3. Ngắn gọn & Liền mạch tuyệt đối:
+- Mặc định gói gọn trong 1-4 câu văn hoàn chỉnh (khoảng 35-85 từ); chỉ mở rộng khi người dùng chủ động yêu cầu phân tích sâu.
+- Các câu phải có chủ ngữ, vị ngữ đầy đủ, liên kết bằng từ nối tự nhiên, hoàn thành trọn vẹn ý trước khi kết thúc (không cắt ngang câu, không chia vụn đoạn rời rạc, không lặp lại ý).
+4. Xác thực & An toàn:
+- Từ chối tên giả/chuỗi gõ phím ngẫu nhiên và ngày sinh không tồn tại trên lịch. Không suy đoán một người đã mất khi chưa có bằng chứng xác thực.
+- Nếu có dấu hiệu bạo lực, thao túng, kiểm soát thì chỉ ra rõ và ưu tiên an toàn. Nếu có ý định tự hại, khuyên ở cạnh người tin cậy và liên hệ Đường dây nóng Ngày Mai 096 306 1414 hoặc Tổng đài 111 (24/7).`;
+
+    function isDeepAnalysisRequested(text) {
+      return /(phân tích sâu|phan tich sau|chi tiết|chi tiet|kỹ hơn|ky hon|giải thích rõ|giai thich ro|cụ thể từng bước|cu the tung buoc)/i.test(String(text ?? ''));
+    }
+
+    function renderInlineBold(text) {
+      return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong class="text-pink-200 font-semibold">$1</strong>');
+    }
+
+    function normalizeCohesiveReply(text) {
+      return String(text ?? '')
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/([a-zA-ZÀ-ỹ0-9])\n([a-zà-ỹ])/g, '$1 $2')
+        .trim();
+    }
+
+    function isCompleteSentenceEnding(text) {
+      const cleaned = String(text ?? '').trim();
+      if (!cleaned) return false;
+      return /[.!?…»”"')\]]$/.test(cleaned);
+    }
+
+    function ensureCompleteEnding(text) {
+      const cleaned = normalizeCohesiveReply(text);
+      if (!cleaned) return '';
+      if (isCompleteSentenceEnding(cleaned)) return cleaned;
+      return `${cleaned}.`;
+    }
+
+    function formatHeraStructuredHtml(rawText) {
+      const cohesive = normalizeCohesiveReply(rawText);
+      const blocks = cohesive.split(/\n{2,}/).filter(Boolean);
+      return blocks.map(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        const isList = lines.length > 1 && lines.every(l => /^([-•*]|\d+[.)])\s+/.test(l));
+        if (isList) {
+          const items = lines.map(l => `<li>${renderInlineBold(l.replace(/^([-•*]|\d+[.)])\s+/, ''))}</li>`).join('');
+          return `<ul class="list-disc pl-5 space-y-1 my-1.5 text-pink-50/95">${items}</ul>`;
+        }
+        return `<p class="mb-2 last:mb-0">${renderInlineBold(lines.join(' '))}</p>`;
+      }).join('');
+    }
+
+    function updateLoveMetricsAfterQuestion() {
+      appState.questionCount += 1;
+      const earnedPercent = Math.min(100, appState.questionCount * 6);
+      if (earnedPercent > appState.soulCompatibility) {
+        appState.soulCompatibility = earnedPercent;
+        appState.flutterLevel = earnedPercent;
+
+        const elModalSoul = document.getElementById('modalSoulScore');
+        const elModalFlutter = document.getElementById('modalFlutterScore');
+        const elHeroCompat = document.getElementById('heroCompatScore');
+        const elBar1 = document.getElementById('heroMatchBar1');
+        const elBar2 = document.getElementById('heroMatchBar2');
+
+        if (elModalSoul) elModalSoul.textContent = `${earnedPercent}%`;
+        if (elModalFlutter) elModalFlutter.textContent = `${earnedPercent}%`;
+        if (elHeroCompat) elHeroCompat.textContent = `${earnedPercent}%`;
+        if (elBar1) elBar1.style.width = `${Math.min(100, 12 + earnedPercent)}%`;
+        if (elBar2) elBar2.style.width = `${Math.min(100, 18 + earnedPercent)}%`;
+      }
+    }
+
+    function appendChatBubble(sender, text, isError = false) {
+      if (!chatMessagesContainer) return null;
+      const bubbleId = 'chatBubble_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const wrapper = document.createElement('div');
+      if (sender === 'user') {
+        wrapper.className = 'flex items-start justify-end gap-3';
+        wrapper.innerHTML = `
+          <div class="max-w-xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 border border-pink-400/35 rounded-2xl rounded-tr-sm px-4 py-3 text-xs sm:text-sm text-white leading-relaxed break-words shadow-lg shadow-pink-500/20">
+            ${escapeHtml(text).replace(/\n/g, '<br>')}
+          </div>
+          <div class="w-9 h-9 rounded-2xl bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-sm shrink-0">🫶</div>`;
+      } else {
+        const bubbleBoxClass = isError
+          ? 'bg-rose-950/60 border border-rose-400/40 rounded-2xl rounded-tl-sm px-4 py-3 text-xs sm:text-sm text-rose-100 leading-relaxed break-words shadow-md flex-1'
+          : 'bg-[#342f3d]/90 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3 text-xs sm:text-sm text-pink-50 leading-relaxed break-words shadow-md flex-1';
+        const badgeText = isError
+          ? 'Hệ thống xác thực • Lưu ý'
+          : 'Hera • Chuyên gia Tâm lý & Mối quan hệ';
+        wrapper.id = bubbleId;
+        wrapper.className = 'flex items-start gap-3 max-w-2xl';
+        wrapper.innerHTML = `
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-sm shrink-0 shadow-md">${isError ? '⚠️' : '💗'}</div>
+          <div class="${bubbleBoxClass}">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-[11px] font-semibold text-pink-200">${badgeText}</span>
+            </div>
+            <div>${formatHeraStructuredHtml(text)}</div>
+          </div>`;
+      }
+      chatMessagesContainer.appendChild(wrapper);
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+      return bubbleId;
+    }
+
+    function appendTypingIndicator() {
+      if (!chatMessagesContainer) return '';
+      const id = 'typingIndicator_' + Date.now();
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = 'flex items-start gap-3 max-w-2xl';
+      div.innerHTML = `
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-sm shrink-0">💗</div>
+        <div class="bg-[#342f3d]/90 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3 text-xs text-pink-200/80 flex items-center gap-1.5">
+          <span>Hera đang suy nghĩ</span><span class="animate-bounce">.</span><span class="animate-bounce" style="animation-delay:0.15s">.</span><span class="animate-bounce" style="animation-delay:0.3s">.</span>
+        </div>`;
+      chatMessagesContainer.appendChild(div);
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+      return id;
+    }
+
+    // Bộ não tư vấn tâm lý thông minh dự phòng trên trình duyệt (hiểu tiếng lóng, liền mạch, ưu tiên giải pháp)
+    function generateSmartLocalCounselorReply(userMessage) {
+      const normalizedSlang = String(userMessage ?? '')
+        .replace(/\bny\b/gi, 'người yêu')
+        .replace(/\bnyc\b/gi, 'người yêu cũ')
+        .replace(/\bngta\b/gi, 'người ta')
+        .replace(/\bko\b|\bkhong\b|\bk\b/gi, 'không')
+        .replace(/\bdc\b|\bđc\b/gi, 'được')
+        .replace(/\bib\b/gi, 'nhắn tin')
+        .replace(/\brep\b/gi, 'trả lời');
+
+      const plain = stripVietnameseAccents(normalizedSlang);
+      const wantsDeep = isDeepAnalysisRequested(normalizedSlang);
+      const isFollowUpTemplate = /(nhan sao|noi the nao|noi sao|mau cau|cu the hon|vi du|bat dau sao|lam sao de noi)/.test(plain);
+      appState.conversationContext.turnCount += 1;
+
+      if (/(tu tu|tu hai|chet di|khong muon song|ket thuc cuoc doi)/.test(plain)) {
+        return 'Sự an toàn của bạn là ưu tiên cao nhất lúc này. Bạn đừng ở một mình mà hãy gọi ngay cho người thân tin cậy hoặc liên hệ miễn phí **Đường dây nóng Ngày Mai (096 306 1414)** hay **Tổng đài 111 (24/7)** để được hỗ trợ kịp thời.';
+      }
+
+      if (/(danh dap|bao luc|do loi|thao tung|gaslighting|kiem soat|chui rua|de doa)/.test(plain)) {
+        return 'Việc liên tục bị kiểm soát, xúc phạm hoặc đổ lỗi ngược là dấu hiệu rõ ràng của sự thiếu tôn trọng ranh giới. Bạn nên giữ khoảng cách an toàn và nói thẳng rằng bạn không chấp nhận cách cư xử đó; nếu đối phương không thay đổi, hãy ưu tiên bảo vệ bản thân và dừng lại.';
+      }
+
+      if (isFollowUpTemplate && appState.conversationContext.lastTopic !== 'general') {
+        const topic = appState.conversationContext.lastTopic;
+        if (topic === 'cold') {
+          return 'Bạn có thể nhắn ngắn gọn thế này: *"Dạo này mình thấy tụi mình ít nói chuyện hơn trước, không biết bạn có đang bận hay áp lực chuyện gì không? Khi nào rảnh mình trò chuyện một chút nhé."* Câu hỏi mở nhẹ nhàng này giúp họ dễ chia sẻ mà không thấy bị trách móc.';
+        }
+        if (topic === 'situationship') {
+          return 'Bạn nên nhắn rõ ràng nhưng bình tĩnh: *"Mình rất trân trọng thời gian bên bạn, nhưng mình muốn biết tụi mình đang hướng tới mối quan hệ nghiêm túc hay chỉ dừng ở mức bạn bè để cả hai không mất thời gian của nhau."*';
+        }
+        if (topic === 'crush') {
+          return 'Bạn hãy mở lời từ một chi tiết gần đây của người ấy, ví dụ: *"Thấy story hôm qua bạn đi quán cà phê nhìn chill ghê, quán đó ở khu nào vậy bạn?"* — cách hỏi tự nhiên này giúp cuộc trò chuyện bắt nhịp rất dễ.';
+        }
+        if (topic === 'overthinking') {
+          return 'Bạn có thể nói nhẹ nhàng với người ấy: *"Mỗi lần bạn bận mà chưa kịp báo trước mình hay bị lo lắng, nếu hôm nào quá bận bạn nhắn giúp mình một câu ngắn để mình yên tâm nhé."*';
+        }
+        if (topic === 'conflict') {
+          return 'Bạn hãy mở lời hạ nhiệt trước: *"Mình không muốn tụi mình im lặng kéo dài thêm nữa, tối nay khi cả hai bình tĩnh mình nói chuyện thẳng thắn để hiểu nhau hơn nhé."*';
+        }
+      }
+
+      if (/(lanh nhat|nhat|it nhan tin|tra loi cham|im lang|chien tranh lanh|vo tam|ghost)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'cold';
+        renderQuickChips(['Nên nhắn tin hỏi thăm thế nào cho khéo?', 'Nếu người ấy vẫn im lặng thì sao?', 'Phân tích sâu lý do họ lạnh nhạt']);
+        if (wantsDeep) {
+          return 'Sự lạnh nhạt thường xuất phát từ ba nguyên nhân: đối phương đang quá tải công việc cá nhân, đang né tránh một mâu thuẫn chưa giải quyết, hoặc tình cảm đã giảm nhiệt. Bước tốt nhất bạn nên làm là chọn lúc cả hai thoải mái để hỏi thẳng một cách bình tĩnh xem điều gì đang xảy ra, tránh nhắn dồn dập; nếu họ vẫn né tránh sau 2 lần trao đổi, bạn nên chủ động lùi lại để bảo vệ giá trị bản thân.';
+        }
+        return 'Có thể người ấy đang có chuyện riêng hoặc tình cảm đang chững lại. Bạn nên chọn lúc cả hai thoải mái để hỏi thẳng một cách bình tĩnh xem điều gì đang xảy ra, tránh vội trách móc hay tự suy diễn.';
+      }
+
+      if (/(map mo|khong ro danh phan|tren tinh ban|chua to tinh|khong cong khai)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'situationship';
+        renderQuickChips(['Mẫu câu hỏi rõ danh phận nhẹ nhàng', 'Nếu họ nói chưa sẵn sàng yêu thì sao?', 'Phân tích sâu tâm lý người thích mập mờ']);
+        if (wantsDeep) {
+          return 'Mối quan hệ mập mờ kéo dài vì đối phương muốn nhận sự quan tâm như người yêu nhưng né tránh trách nhiệm cam kết. Giải pháp hiệu quả nhất là bạn chủ động mở một cuộc trò chuyện xác nhận vị trí của cả hai trong tuần này; nếu họ tiếp tục trả lời vòng vo, hãy dứt khoát dừng lại để dành cơ hội cho người xứng đáng hơn.';
+        }
+        return 'Mối quan hệ mập mờ tồn tại vì hai bạn chưa thiết lập ranh giới cam kết rõ ràng. Bạn nên chủ động hỏi thẳng xem cả hai đang ở vị trí nào trong cuộc sống của nhau; nếu họ tiếp tục né tránh câu trả lời, hãy dứt khoát dừng lại.';
+      }
+
+      if (/(cai nhau|xung dot|gian nhau|hieu lam|bat dong|lam hoa)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'conflict';
+        renderQuickChips(['Mẫu tin nhắn mở lời làm hòa tự nhiên', 'Cách góp ý để người yêu không tự ái']);
+        return 'Khi vừa căng thẳng, cả hai đều dễ nói lời làm tổn thương nhau vì cái tôi cao. Bạn nên đợi khoảng vài tiếng cho cảm xúc hạ nhiệt rồi chủ động nhắn một câu ngắn đề nghị cùng ngồi lại trao đổi thẳng thắn trên tinh thần lắng nghe.';
+      }
+
+      if (/(crush|thich mot nguoi|bat chuyen|nhan tin lam quen|mo loi|tan tinh)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'crush';
+        renderQuickChips(['Gợi ý câu mở đầu tin nhắn tự nhiên', 'Dấu hiệu crush cũng có ý với mình', 'Cách rủ crush đi cà phê không bị sượng']);
+        return 'Để bắt chuyện tự nhiên, bạn hãy mở lời từ một điểm chung cụ thể như bài đăng, sở thích hoặc công việc của người ấy thay vì hỏi xã giao chung chung. Một câu nhận xét vui vẻ kèm một câu hỏi mở ngắn sẽ giúp họ dễ trả lời ngay.';
+      }
+
+      if (/(chia tay|nguoi yeu cu|that tinh|hut hang|quay lai)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'breakup';
+        renderQuickChips(['Có nên nhắn tin cho người yêu cũ không?', 'Làm sao để nguôi ngoai nhanh hơn?']);
+        return 'Cảm giác hụt hẫng sau chia tay là phản ứng tự nhiên khi thói quen gắn bó bị ngắt đột ngột. Bạn nên tạm ngưng liên lạc và ẩn trang cá nhân của người cũ ít nhất 30 ngày để cảm xúc ổn định lại trước khi đưa ra bất kỳ quyết định nào.';
+      }
+
+      if (/(yeu xa|khoang cach|khac thanh pho|di du hoc)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'ldr';
+        renderQuickChips(['Cách giữ kết nối khi cả hai đều bận', 'Xử lý hiểu lầm qua tin nhắn thế nào?']);
+        return 'Khi yêu xa, sự đều đặn và tin cậy quan trọng hơn việc nhắn tin liên tục cả ngày. Hai bạn nên chốt một khung giờ cố định mỗi tuần để gọi video trò chuyện trọn vẹn và luôn hẹn trước mốc ngày gặp mặt tiếp theo.';
+      }
+
+      if (/(overthinking|suy nghi nhieu|bat an|so bi bo roi|ghen)/.test(plain)) {
+        appState.conversationContext.lastTopic = 'overthinking';
+        renderQuickChips(['Cách chia sẻ nỗi bất an không gây áp lực', 'Làm sao bớt suy diễn khi họ trả lời chậm?']);
+        return 'Overthinking thường xảy ra khi bạn tự lấp khoảng trống im lặng bằng những kịch bản tiêu cực. Khi thấy bất an, bạn hãy tạm rời điện thoại 15 phút để tập trung vào một việc cụ thể và chỉ đánh giá mối quan hệ qua hành động thực tế của đối phương.';
+      }
+
+      if (/(cung hoang dao|xem tuoi|hop nhau|tu vi|menh)/.test(plain)) {
+        return 'Cung hoàng đạo hay tuổi tác chỉ phản ánh một phần nét tính cách tham khảo, còn sự bền vững phụ thuộc vào cách hai bạn giao tiếp thực tế. Bạn có thể dùng mục **Xem cung hoàng đạo cặp đôi** để đối chiếu nhanh, hoặc kể cho mình nghe vướng mắc cụ thể giữa hai bạn.';
+      }
+
+      return 'Bạn hãy chia sẻ ngắn gọn **tình huống cụ thể đang xảy ra** giữa hai bạn để mình đưa ra hướng xử lý sát nhất nhé.';
+    }
+
+    async function requestGeminiContent(apiKey, model, payload, timeoutMs = 18000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) return { ok: false, status: response.status };
+
+        const candidate = data?.candidates?.[0];
+        const parts = candidate?.content?.parts || [];
+        const text = parts
+          .filter(p => !p?.thought && typeof p?.text === 'string')
+          .map(p => p.text)
+          .join('');
+        const fallbackText = !text
+          ? parts.map(p => (typeof p?.text === 'string' ? p.text : '')).join('')
+          : text;
+
+        return {
+          ok: Boolean(fallbackText.trim()),
+          text: fallbackText.trim(),
+          finishReason: candidate?.finishReason || 'STOP'
+        };
+      } catch (_) {
+        return { ok: false, status: 0 };
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function callGeminiWithKey(recentMessages, userMessage = '') {
+      const apiKey = getConfiguredApiKey();
+      if (!apiKey) return { ok: false, fallback: true };
+
+      const primaryModel = getConfiguredModel();
+      const candidateModels = Array.from(new Set([primaryModel, 'gemini-2.5-flash', 'gemini-2.0-flash']));
+      const wantsDeep = isDeepAnalysisRequested(userMessage);
+
+      const systemItem = recentMessages.find(m => m.role === 'system');
+      const modeInstruction = wantsDeep
+        ? '\n[Chế độ hiện tại: Người dùng yêu cầu phân tích chi tiết, hãy giải thích rõ ràng, mạch lạc, hoàn chỉnh mọi câu và chốt lại bằng giải pháp cụ thể.]'
+        : '\n[Chế độ hiện tại: Trả lời ngắn gọn 1-4 câu hoàn chỉnh liền mạch, đi thẳng vào vấn đề và đưa ngay giải pháp tốt nhất.]';
+
+      const baseContents = recentMessages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
+
+      const generationConfig = {
+        temperature: 0.35,
+        maxOutputTokens: wantsDeep ? 1600 : 850
+      };
+
+      for (const model of candidateModels) {
+        const payload = { contents: baseContents, generationConfig };
+        if (systemItem?.content) {
+          payload.systemInstruction = { parts: [{ text: systemItem.content + modeInstruction }] };
+        }
+
+        const firstPass = await requestGeminiContent(apiKey, model, payload);
+        if (!firstPass.ok || !firstPass.text) continue;
+
+        let combinedReply = firstPass.text;
+        const wasTruncated = firstPass.finishReason === 'MAX_TOKENS' || !isCompleteSentenceEnding(combinedReply);
+
+        // Nếu phản hồi bị ngắt giữa chừng (MAX_TOKENS hoặc câu chưa kết thúc trọn vẹn), tự động gọi nối tiếp để hoàn thiện câu
+        if (wasTruncated) {
+          const continuationPayload = {
+            contents: [
+              ...baseContents,
+              { role: 'model', parts: [{ text: combinedReply }] },
+              { role: 'user', parts: [{ text: 'Hãy viết tiếp cho trọn vẹn câu và ý đang dở ở trên thật ngắn gọn, tự nhiên, không lặp lại phần đã viết.' }] }
+            ],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 450
+            }
+          };
+          if (systemItem?.content) {
+            continuationPayload.systemInstruction = { parts: [{ text: systemItem.content }] };
+          }
+          const contPass = await requestGeminiContent(apiKey, model, continuationPayload, 12000);
+          if (contPass.ok && contPass.text) {
+            const joiner = /[\s\n]$/.test(combinedReply) || /^[,.;:!?)]/.test(contPass.text) ? '' : ' ';
+            combinedReply = `${combinedReply}${joiner}${contPass.text}`;
+          }
+        }
+
+        return { ok: true, reply: ensureCompleteEnding(combinedReply) };
+      }
+
+      return { ok: false, fallback: true };
+    }
+
+    async function fetchCounselorReply(userMessage) {
+      const sessionAtStart = appState.chatSessionToken;
+      const zodiacContextNote = appState.lastZodiacSummary
+        ? `\nBối cảnh cặp đôi đã xác thực: ${appState.lastZodiacSummary}. Phân tích dựa trên tâm lý giao tiếp thực tế, không mê tín.`
+        : '';
+
+      const updatedHistory = [...appState.chatHistory, { role: 'user', content: userMessage }];
+      const recentMessages = [
+        { role: 'system', content: HERA_SYSTEM_PROMPT + zodiacContextNote },
+        ...updatedHistory.slice(-14)
+      ];
+
+      const cloudResult = await callGeminiWithKey(recentMessages, userMessage);
+      if (sessionAtStart !== appState.chatSessionToken) return null;
+
+      const finalReply = cloudResult.ok
+        ? normalizeCohesiveReply(cloudResult.reply)
+        : generateSmartLocalCounselorReply(userMessage);
+
+      appState.chatHistory = [...updatedHistory, { role: 'assistant', content: finalReply }];
+      return { ok: true, reply: finalReply };
+    }
+
+    async function sendUserMessage() {
+      if (!chatInput) return;
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      if (appState.isRequestInFlight) {
+        showToast('Hera đang xử lý câu hỏi trước đó, vui lòng chờ giây lát...');
+        return;
+      }
+
+      const now = Date.now();
+      if (now - appState.lastRequestTimestamp < HERA_MIN_REQUEST_INTERVAL_MS) {
+        showToast('Bạn thao tác hơi nhanh, vui lòng chờ 1 giây rồi gửi tiếp nhé.');
+        return;
+      }
+
+      // Kiểm tra lớp bảo vệ đầu vào trước khi gửi tới API
+      const guardResult = inspectChatMessageBeforeApi(text);
+      chatInput.value = '';
+      appendChatBubble('user', text);
+
+      if (guardResult.blocked) {
+        appendChatBubble('ai', guardResult.reply, true);
+        return;
+      }
+
+      const currentSession = appState.chatSessionToken;
+      appState.lastRequestTimestamp = now;
+      appState.isRequestInFlight = true;
+      if (sendMessageBtn) sendMessageBtn.disabled = true;
+
+      updateLoveMetricsAfterQuestion();
+      const typingId = appendTypingIndicator();
+
+      try {
+        const result = await fetchCounselorReply(text);
+        if (!result || currentSession !== appState.chatSessionToken) {
+          document.getElementById(typingId)?.remove();
+          return;
+        }
+        document.getElementById(typingId)?.remove();
+        appendChatBubble('ai', result.reply, false);
+      } finally {
+        appState.isRequestInFlight = false;
+        if (sendMessageBtn) sendMessageBtn.disabled = false;
+      }
+    }
+
+    sendMessageBtn?.addEventListener('click', sendUserMessage);
+    chatInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMessage(); }
+    });
+
+    /* ==========================================================================
+       XEM CUNG HOÀNG ĐẠO & TUỔI CẶP ĐÔI (XÁC THỰC CHẶT CHẼ REAL-TIME + SUBMIT)
+       ========================================================================== */
+    function formatDobInputMask(inputEl) {
+      if (!inputEl) return;
+      const digits = inputEl.value.replace(/\D/g, '').slice(0, 8);
+      let formatted = digits;
+      if (digits.length > 4) {
+        formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+      } else if (digits.length > 2) {
+        formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+      }
+      inputEl.value = formatted;
+    }
+
+    function setPersonValidationVisual(personIndex, state) {
+      const nameInput = document.getElementById(`zodiacName${personIndex}`);
+      const dobInput = document.getElementById(`zodiacDob${personIndex}`);
+      const nameState = document.getElementById(`zodiacNameState${personIndex}`);
+      const dobState = document.getElementById(`zodiacDobState${personIndex}`);
+      const msgBox = document.getElementById(`zodiacValidationMsg${personIndex}`);
+      const card = document.getElementById(`zodiacCard${personIndex}`);
+
+      const resetInputBorder = (el) => {
+        if (!el) return;
+        el.classList.remove('border-rose-400', 'border-emerald-400/70', 'border-white/15');
+        el.classList.add('border-white/15');
+      };
+
+      resetInputBorder(nameInput);
+      resetInputBorder(dobInput);
+
+      if (state.nameStatus === 'valid' && nameInput && nameState) {
+        nameInput.classList.replace('border-white/15', 'border-emerald-400/70');
+        nameState.textContent = '✔ Hợp lệ';
+        nameState.className = 'text-[10px] font-semibold text-emerald-400';
+      } else if (state.nameStatus === 'invalid' && nameInput && nameState) {
+        nameInput.classList.replace('border-white/15', 'border-rose-400');
+        nameState.textContent = '✕ Chưa hợp lệ';
+        nameState.className = 'text-[10px] font-semibold text-rose-400';
+      } else if (nameState) {
+        nameState.textContent = 'Bắt buộc';
+        nameState.className = 'text-[10px] font-semibold text-pink-200/50';
+      }
+
+      if (state.dobStatus === 'valid' && dobInput && dobState) {
+        dobInput.classList.replace('border-white/15', 'border-emerald-400/70');
+        dobState.textContent = '✔ Hợp lệ';
+        dobState.className = 'text-[10px] font-semibold text-emerald-400';
+      } else if (state.dobStatus === 'invalid' && dobInput && dobState) {
+        dobInput.classList.replace('border-white/15', 'border-rose-400');
+        dobState.textContent = '✕ Chưa hợp lệ';
+        dobState.className = 'text-[10px] font-semibold text-rose-400';
+      } else if (dobState) {
+        dobState.textContent = 'Bắt buộc';
+        dobState.className = 'text-[10px] font-semibold text-pink-200/50';
+      }
+
+      if (msgBox) {
+        if (state.errorMessage) {
+          msgBox.innerHTML = `<span class="shrink-0">⚠️</span><span>${escapeHtml(state.errorMessage)}</span>`;
+          msgBox.classList.remove('hidden');
+          card?.classList.add('border-rose-400/45');
+        } else {
+          msgBox.innerHTML = '';
+          msgBox.classList.add('hidden');
+          card?.classList.remove('border-rose-400/45');
+        }
+      }
+    }
+
+    function liveValidatePersonCard(personIndex, showEmptyError = false) {
+      const nameEl = document.getElementById(`zodiacName${personIndex}`);
+      const dobEl = document.getElementById(`zodiacDob${personIndex}`);
+      const rawName = nameEl?.value || '';
+      const rawDob = dobEl?.value || '';
+
+      let nameStatus = 'neutral';
+      let dobStatus = 'neutral';
+      let errorMessage = '';
+
+      if (rawName.trim() || showEmptyError) {
+        const nRes = validateFullName(rawName);
+        if (nRes.valid) {
+          const dCheck = checkDeceasedStatus(nRes.normalized);
+          if (dCheck.isDeceased) {
+            nameStatus = 'invalid';
+            errorMessage = dCheck.reason;
+          } else {
+            nameStatus = 'valid';
+          }
+        } else {
+          nameStatus = 'invalid';
+          errorMessage = nRes.reason;
+        }
+      }
+
+      if (rawDob.trim() || showEmptyError) {
+        if (!showEmptyError && rawDob.trim().length < 8) {
+          dobStatus = 'neutral';
+        } else {
+          const dobRes = validateDateOfBirth(rawDob);
+          if (dobRes.valid) {
+            dobStatus = 'valid';
+          } else {
+            dobStatus = 'invalid';
+            if (!errorMessage) errorMessage = dobRes.reason;
+          }
+        }
+      }
+
+      setPersonValidationVisual(personIndex, { nameStatus, dobStatus, errorMessage });
+    }
+
+    function initZodiacValidationListeners() {
+      [1, 2].forEach(idx => {
+        const nameEl = document.getElementById(`zodiacName${idx}`);
+        const dobEl = document.getElementById(`zodiacDob${idx}`);
+
+        nameEl?.addEventListener('input', () => {
+          // Loại bỏ ngay chữ số khi người dùng gõ vào ô họ tên
+          const cleaned = nameEl.value.replace(/[0-9]/g, '');
+          if (cleaned !== nameEl.value) nameEl.value = cleaned;
+          document.getElementById('zodiacPairGlobalError')?.classList.add('hidden');
+          liveValidatePersonCard(idx, false);
+        });
+
+        nameEl?.addEventListener('blur', () => {
+          const res = validateFullName(nameEl.value);
+          if (res.valid) nameEl.value = res.normalized;
+          liveValidatePersonCard(idx, false);
+        });
+
+        dobEl?.addEventListener('input', () => {
+          formatDobInputMask(dobEl);
+          document.getElementById('zodiacPairGlobalError')?.classList.add('hidden');
+          liveValidatePersonCard(idx, false);
+        });
+
+        dobEl?.addEventListener('blur', () => {
+          const res = validateDateOfBirth(dobEl.value);
+          if (res.valid) dobEl.value = res.normalized;
+          liveValidatePersonCard(idx, false);
+        });
+      });
+    }
+
+    function getWesternZodiac(day, month) {
+      const signs = [
+        { name: 'Ma Kết ♑', element: 'Nhóm Đất (Thực tế & Bền bỉ)', elKey: 'Đất', start: [12, 22], end: [1, 19] },
+        { name: 'Bảo Bình ♒', element: 'Nhóm Khí (Độc lập & Sáng tạo)', elKey: 'Khí', start: [1, 20], end: [2, 18] },
+        { name: 'Song Ngư ♓', element: 'Nhóm Nước (Nhạy cảm & Thấu cảm)', elKey: 'Nước', start: [2, 19], end: [3, 20] },
+        { name: 'Bạch Dương ♈', element: 'Nhóm Lửa (Nhiệt huyết & Thẳng thắn)', elKey: 'Lửa', start: [3, 21], end: [4, 19] },
+        { name: 'Kim Ngưu ♉', element: 'Nhóm Đất (Ổn định & Chung thủy)', elKey: 'Đất', start: [4, 20], end: [5, 20] },
+        { name: 'Song Tử ♊', element: 'Nhóm Khí (Linh hoạt & Giao tiếp tốt)', elKey: 'Khí', start: [5, 21], end: [6, 21] },
+        { name: 'Cự Giải ♋', element: 'Nhóm Nước (Ấm áp & Quan tâm)', elKey: 'Nước', start: [6, 22], end: [7, 22] },
+        { name: 'Sư Tử ♌', element: 'Nhóm Lửa (Chân thành & Bảo vệ)', elKey: 'Lửa', start: [7, 23], end: [8, 22] },
+        { name: 'Xử Nữ ♍', element: 'Nhóm Đất (Tinh tế & Chu đáo)', elKey: 'Đất', start: [8, 23], end: [9, 22] },
+        { name: 'Thiên Bình ♎', element: 'Nhóm Khí (Hài hòa & Công bằng)', elKey: 'Khí', start: [9, 23], end: [10, 23] },
+        { name: 'Bọ Cạp ♏', element: 'Nhóm Nước (Sâu sắc & Quyết liệt)', elKey: 'Nước', start: [10, 24], end: [11, 22] },
+        { name: 'Nhân Mã ♐', element: 'Nhóm Lửa (Cởi mở & Lạc quan)', elKey: 'Lửa', start: [11, 23], end: [12, 21] }
+      ];
+      for (const s of signs) {
+        if ((month === s.start[0] && day >= s.start[1]) || (month === s.end[0] && day <= s.end[1])) return s;
+      }
+      return signs[0];
+    }
+
+    function getChineseZodiac(year) {
+      const can = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
+      const chi = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi'];
+      const elements = ['Kim', 'Kim', 'Thủy', 'Thủy', 'Mộc', 'Mộc', 'Hỏa', 'Hỏa', 'Thổ', 'Thổ'];
+      return { fullName: `${can[year % 10]} ${chi[year % 12]}`, chiIdx: year % 12, element: `Niên mệnh ${elements[year % 10]}` };
+    }
+
+    document.getElementById('analyzeZodiacBtn')?.addEventListener('click', () => {
+      const nameEl1 = document.getElementById('zodiacName1');
+      const dobEl1 = document.getElementById('zodiacDob1');
+      const nameEl2 = document.getElementById('zodiacName2');
+      const dobEl2 = document.getElementById('zodiacDob2');
+      const globalErrBox = document.getElementById('zodiacPairGlobalError');
+      const resultSection = document.getElementById('zodiacResultSection');
+
+      if (globalErrBox) { globalErrBox.innerHTML = ''; globalErrBox.classList.add('hidden'); }
+
+      const p1 = validatePersonProfile(nameEl1?.value, dobEl1?.value, '');
+      const p2 = validatePersonProfile(nameEl2?.value, dobEl2?.value, '');
+
+      liveValidatePersonCard(1, true);
+      liveValidatePersonCard(2, true);
+
+      if (!p1.valid || !p2.valid) {
+        resultSection?.classList.add('hidden');
+        appState.lastZodiacSummary = '';
+
+        const firstBadEl = !p1.valid
+          ? (p1.field === 'name' ? nameEl1 : dobEl1)
+          : (p2.field === 'name' ? nameEl2 : dobEl2);
+
+        if (firstBadEl) {
+          firstBadEl.classList.remove('input-shake-error');
+          void firstBadEl.offsetWidth;
+          firstBadEl.classList.add('input-shake-error');
+          firstBadEl.focus();
+        }
+        showToast('⚠️ Thông tin chưa hợp lệ. Vui lòng kiểm tra lại họ tên và ngày sinh thật!');
+        return;
+      }
+
+      // Chuẩn hóa giá trị hiển thị trên input sau khi xác thực thành công
+      if (nameEl1) nameEl1.value = p1.name;
+      if (dobEl1) dobEl1.value = p1.dob.normalized;
+      if (nameEl2) nameEl2.value = p2.name;
+      if (dobEl2) dobEl2.value = p2.dob.normalized;
+
+      // Chặn nhập trùng y hệt 1 người cho cả 2 ô
+      if (stripVietnameseAccents(p1.name) === stripVietnameseAccents(p2.name) && p1.dob.normalized === p2.dob.normalized) {
+        resultSection?.classList.add('hidden');
+        appState.lastZodiacSummary = '';
+        if (globalErrBox) {
+          globalErrBox.innerHTML = `<span>⚠️</span><span>Thông tin của <strong>Người 1</strong> và <strong>Người 2</strong> đang trùng nhau hoàn toàn. Vui lòng nhập thông tin của hai người khác nhau để xem độ hòa hợp.</span>`;
+          globalErrBox.classList.remove('hidden');
+        }
+        nameEl2?.focus();
+        return;
+      }
+
+      const w1 = getWesternZodiac(p1.dob.day, p1.dob.month);
+      const w2 = getWesternZodiac(p2.dob.day, p2.dob.month);
+      const c1 = getChineseZodiac(p1.dob.year);
+      const c2 = getChineseZodiac(p2.dob.year);
+
+      let westernScore = 78;
+      let westernTag = 'Bổ Trợ Khác Biệt';
+      if (w1.elKey === w2.elKey) {
+        westernScore = 91;
+        westernTag = 'Cùng Nhóm Tính Cách';
+      } else if (
+        (w1.elKey === 'Lửa' && w2.elKey === 'Khí') ||
+        (w1.elKey === 'Khí' && w2.elKey === 'Lửa') ||
+        (w1.elKey === 'Đất' && w2.elKey === 'Nước') ||
+        (w1.elKey === 'Nước' && w2.elKey === 'Đất')
+      ) {
+        westernScore = 93;
+        westernTag = 'Bổ Trợ Hài Hòa';
+      }
+
+      const diffChi = Math.abs(c1.chiIdx - c2.chiIdx);
+      let chineseScore = 80;
+      let chineseTag = 'Gần Gũi Thế Hệ';
+      if (diffChi === 4 || diffChi === 8) {
+        chineseScore = 92;
+        chineseTag = 'Đồng Điệu Nhịp Sống';
+      } else if (diffChi === 6) {
+        chineseScore = 75;
+        chineseTag = 'Cần Lắng Nghe Nhiều Hơn';
+      } else if ((c1.chiIdx + c2.chiIdx) % 12 === 9) {
+        chineseScore = 89;
+        chineseTag = 'Dễ Thấu Hiểu Nhau';
+      }
+
+      const totalPercent = Math.round((westernScore + chineseScore) / 2);
+      const rankBadge = totalPercent >= 90
+        ? 'Rất giàu tiềm năng gắn kết ✨'
+        : totalPercent >= 82
+          ? 'Tâm đầu ý hợp 💖'
+          : 'Khác biệt thú vị cần thấu hiểu 🌱';
+
+      document.getElementById('zodiacPairHeadline').textContent = `${p1.name} (${w1.name}) & ${p2.name} (${w2.name})`;
+      document.getElementById('zodiacPairSummary').textContent = `Hồ sơ đã xác thực: ${p1.name} (${p1.dob.normalized}) và ${p2.name} (${p2.dob.normalized}). Nét tính cách giữa ${w1.name} và ${w2.name} mang lại nhiều điểm chạm thú vị; chỉ số mang tính tham khảo, yếu tố quyết định vẫn là sự lắng nghe và tôn trọng ranh giới của nhau.`;
+      document.getElementById('zodiacTotalPercent').textContent = `${totalPercent}%`;
+      document.getElementById('zodiacRankBadge').textContent = rankBadge;
+      document.getElementById('chineseCompatTag').textContent = chineseTag;
+      document.getElementById('chineseAnimal1').textContent = `${c1.fullName} (${p1.dob.year})`;
+      document.getElementById('chineseElement1').textContent = c1.element;
+      document.getElementById('chineseAnimal2').textContent = `${c2.fullName} (${p2.dob.year})`;
+      document.getElementById('chineseElement2').textContent = c2.element;
+      document.getElementById('chineseDetailText').textContent = `${p1.name} (${c1.fullName}) và ${p2.name} (${c2.fullName}) có khoảng cách thế hệ phù hợp để dễ chia sẻ quan điểm sống và định hướng tương lai nếu duy trì đối thoại cởi mở.`;
+      document.getElementById('westernCompatTag').textContent = westernTag;
+      document.getElementById('westernSign1').textContent = `${w1.name} (${p1.dob.normalized})`;
+      document.getElementById('westernElement1').textContent = w1.element;
+      document.getElementById('westernSign2').textContent = `${w2.name} (${p2.dob.normalized})`;
+      document.getElementById('westernElement2').textContent = w2.element;
+      document.getElementById('westernDetailText').textContent = `${w1.name} (${w1.element}) khi đồng hành cùng ${w2.name} (${w2.element}) tạo nên sự cân bằng giữa lý trí và cảm xúc. Hiểu rõ điểm mạnh của nhau giúp giảm hiểu lầm khi giao tiếp.`;
+      document.getElementById('zodiacAdviceBox').textContent = `💡 Góc nhìn tâm lý từ Hera: Mọi cặp đôi đều có nét tính cách riêng. Bạn có thể bấm nút bên cạnh để nhờ Hera gợi ý cách giao tiếp phù hợp với đặc trưng của hai bạn.`;
+
+      appState.lastZodiacSummary = `Hồ sơ cặp đôi đã xác thực: ${p1.name} (sinh ${p1.dob.normalized}, cung ${w1.name}) và ${p2.name} (sinh ${p2.dob.normalized}, cung ${w2.name}), mức tương đồng tham khảo ${totalPercent}%. Hãy tư vấn ngắn gọn điểm cần lưu ý trong giao tiếp thực tế để hai người hiểu nhau hơn.`;
+      resultSection?.classList.remove('hidden');
+      triggerCupidBlessing();
+      showToast(`✨ Đã xác thực thông tin và phân tích cặp đôi ${p1.name} & ${p2.name}!`);
+    });
+
+    document.getElementById('sendZodiacToChatBtn')?.addEventListener('click', () => {
+      switchModal('zodiacCoupleModal', 'loveCounselingModal');
+      if (appState.lastZodiacSummary && chatInput) {
+        chatInput.value = appState.lastZodiacSummary;
+        sendUserMessage();
+      }
+    });
+
+    const cupidBlessings = [
+      '💘 Thiên Thần 5D gửi đến bạn một nguồn năng lượng bình yên và tự tin hôm nay!',
+      '✨ Lắng nghe cảm xúc của chính mình là bước đầu tiên của một tình yêu lành mạnh!',
+      '💗 Bạn luôn xứng đáng được tôn trọng, thấu hiểu và yêu thương chân thành!',
+      '🌸 Một cuộc trò chuyện cởi mở và dịu dàng có thể tháo gỡ nhiều nút thắt!'
+    ];
+    function triggerCupidBlessing(event) {
+      if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof window.triggerAngel5DMiracle === 'function') window.triggerAngel5DMiracle();
+      [document.getElementById('heroCupidStage'), document.getElementById('zodiacCupidCompanion')].forEach(stage => {
+        if (!stage) return;
+        stage.classList.remove('cupid-joy-active'); void stage.offsetWidth; stage.classList.add('cupid-joy-active');
+      });
+      showToast(cupidBlessings[Math.floor(Math.random() * cupidBlessings.length)]);
+    }
+
+    window.triggerCupidBlessing = triggerCupidBlessing;
+    window.openLoveModal = openLoveModal;
+    window.closeLoveModal = closeLoveModal;
+    window.openZodiacModal = openZodiacModal;
+    window.closeZodiacModal = closeZodiacModal;
+    window.switchModal = switchModal;
+    window.startTopicConsultation = startTopicConsultation;
+    window.sendQuickChipPrompt = sendQuickChipPrompt;
+    window.resetChatConversation = resetChatConversation;
+    window.openAiSettingsModal = openAiSettingsModal;
+    window.closeAiSettingsModal = closeAiSettingsModal;
+    window.saveAiSettings = saveAiSettings;
+    window.clearAiSettings = clearAiSettings;
+
+    function bootstrapApp() {
+      initVisualEffects();
+      renderTopicCards();
+      initHeaderSearch();
+      initZodiacValidationListeners();
+      updateAiEngineBadge();
+      renderInitialHeraGreeting();
+    }
+    if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', bootstrapApp);
+    else bootstrapApp();
+  </script>
+</body>
+</html>
